@@ -308,3 +308,21 @@ $router->options('/getVideoPicByDate', ['middleware' => 'cors','uses' => 'PoiCon
 $router->post('/addCameras', ['middleware' => 'cors','uses' => 'PoiController@addCameras']);
 $router->get('/addCameras', ['middleware' => 'cors','uses' => 'PoiController@addCameras']);
 $router->options('/addCameras', ['middleware' => 'cors','uses' => 'PoiController@addCameras']);
+
+
+
+$router->post('/addQianXun', ['middleware' => 'cors','uses' => 'ProjectController@addQianXun']);
+$router->get('/addQianXun', ['middleware' => 'cors','uses' => 'ProjectController@addQianXun']);
+$router->options('/addQianXun', ['middleware' => 'cors','uses' => 'ProjectController@addQianXun']);
+
+$router->post('/delQianXun', ['middleware' => 'cors','uses' => 'ProjectController@delQianXun']);
+$router->get('/delQianXun', ['middleware' => 'cors','uses' => 'ProjectController@delQianXun']);
+$router->options('/delQianXun', ['middleware' => 'cors','uses' => 'ProjectController@delQianXun']);
+
+$router->post('/updateQianXun', ['middleware' => 'cors','uses' => 'ProjectController@updateQianXun']);
+$router->get('/updateQianXun', ['middleware' => 'cors','uses' => 'ProjectController@updateQianXun']);
+$router->options('/updateQianXun', ['middleware' => 'cors','uses' => 'ProjectController@updateQianXun']);
+
+$router->post('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectController@getQianXun']);
+$router->get('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectController@getQianXun']);
+$router->options('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectController@getQianXun']);

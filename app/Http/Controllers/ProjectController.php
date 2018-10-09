@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Project;
 use Illuminate\Support\Facades\Auth;
+use App\QianXun;
 include_once 'addUserLog.php';
 
 class ProjectController extends Controller
@@ -198,4 +199,113 @@ class ProjectController extends Controller
         }
         return response()->json($object);
     }
+
+    public function addQianXun(Request $request){
+        $this->validate($request, [
+            'device_id' => 'required',
+            'monitor_account'=>'required',
+            'monitor_account_pwd'=>'required',
+        ]);
+
+
+        $qianxun = new QianXun;
+        $qianxun->device_id = $request->device_id;
+        $qianxun->monitor_account = $request->monitor_account;
+        $qianxun->monitor_account_pwd = $request->monitor_account_pwd;
+
+        if ($request->has('monitor_points_id'))
+            $qianxun->monitor_points_id = $request->input('monitor_points_id');
+        if ($request->has('monitor_points_name'))
+            $qianxun->monitor_points_id = $request->input('monitor_points_name');
+        if ($request->has('sik'))
+            $qianxun->monitor_points_id = $request->input('sik');
+        if ($request->has('sis'))
+            $qianxun->monitor_points_id = $request->input('sis');
+        if ($request->has('stand_x'))
+            $qianxun->monitor_points_id = $request->input('stand_x');
+        if ($request->has('stand_y'))
+            $qianxun->monitor_points_id = $request->input('stand_y');
+        if ($request->has('stand_z'))
+            $qianxun->monitor_points_id = $request->input('stand_z');
+
+        $qianxun->save();
+
+        addUserLog('addQianXun', $this->guard()->user()->id, 1);
+
+        return response()->json(['message' => 'add_ok']);
+
+    }
+
+    public function delQianXun(Request $request){
+
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+
+
+        $qianxun = QianXun::findOrFail(intval($request->id));
+
+        $qianxun->delete();
+
+        addUserLog('delQianXun', $this->guard()->user()->id, 2);
+
+
+        return response()->json(['message' => 'del_ok']);
+
+    }
+
+    public function updateQianXun(Request $request){
+
+        $this->validate($request, [
+            'id' => 'required',
+        ]);
+
+
+        $qianxun = QianXun::findOrFail(intval($request->id));
+        //$qianxun = QianXun::where('id',$request->id)->get();
+        //当使用get或all方法获取查询结果时获取到的是包含对象的数组，因此访问其中对象时或使用对象方法时应遍历数组，即使对象中仅有一个数据。
+        //使用find或first等方法时可以直接获取到一个对象，可以直接访问对象中的内容，使用对象的方法
+        //return response()->json($qianxun);
+
+        if ($request->has('device_id'))
+            $qianxun->monitor_points_id = $request->input('device_id');
+        if ($request->has('monitor_account'))
+            $qianxun->monitor_points_id = $request->input('monitor_account');
+        if ($request->has('monitor_account_pwd'))
+            $qianxun->monitor_points_id = $request->input('monitor_account_pwd');
+        if ($request->has('monitor_points_id'))
+            $qianxun->monitor_points_id = $request->input('monitor_points_id');
+        if ($request->has('monitor_points_name'))
+            $qianxun->monitor_points_id = $request->input('monitor_points_name');
+        if ($request->has('sik'))
+            $qianxun->monitor_points_id = $request->input('sik');
+        if ($request->has('sis'))
+            $qianxun->monitor_points_id = $request->input('sis');
+        if ($request->has('stand_x'))
+            $qianxun->monitor_points_id = $request->input('stand_x');
+        if ($request->has('stand_y'))
+            $qianxun->monitor_points_id = $request->input('stand_y');
+        if ($request->has('stand_z'))
+            $qianxun->monitor_points_id = $request->input('stand_z');
+
+        $qianxun->save();
+
+        addUserLog('updateQianXun', $this->guard()->user()->id, 3);
+
+        return response()->json(['message' => 'update_ok']);
+    }
+
+    public function getQianXun(Request $request){
+
+        $this->validate($request, [
+            'device_id' => 'required',
+        ]);
+
+
+        $qianxun = QianXun::where('device_id',$request->device_id)->get();
+
+
+        return response()->json($qianxun);
+    }
+
 }
