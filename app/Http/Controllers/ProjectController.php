@@ -207,6 +207,7 @@ class ProjectController extends Controller
             'monitor_account_pwd'=>'required',
         ]);
 
+        //return response()->json($request);
 
         $qianxun = new QianXun;
         $qianxun->device_id = $request->device_id;
@@ -214,19 +215,19 @@ class ProjectController extends Controller
         $qianxun->monitor_account_pwd = $request->monitor_account_pwd;
 
         if ($request->has('monitor_points_id'))
-            $qianxun->monitor_points_id = $request->input('monitor_points_id');
+            $qianxun->monitor_points_id = $request->monitor_points_id;
         if ($request->has('monitor_points_name'))
-            $qianxun->monitor_points_id = $request->input('monitor_points_name');
+            $qianxun->monitor_points_name = $request->monitor_points_name;
         if ($request->has('sik'))
-            $qianxun->monitor_points_id = $request->input('sik');
+            $qianxun->sik = $request->sik;
         if ($request->has('sis'))
-            $qianxun->monitor_points_id = $request->input('sis');
+            $qianxun->sis = $request->sis;
         if ($request->has('stand_x'))
-            $qianxun->monitor_points_id = $request->input('stand_x');
+            $qianxun->stand_x = $request->stand_x;
         if ($request->has('stand_y'))
-            $qianxun->monitor_points_id = $request->input('stand_y');
+            $qianxun->stand_y = $request->stand_y;
         if ($request->has('stand_z'))
-            $qianxun->monitor_points_id = $request->input('stand_z');
+            $qianxun->stand_z = $request->stand_z;
 
         $qianxun->save();
 
@@ -268,25 +269,25 @@ class ProjectController extends Controller
         //return response()->json($qianxun);
 
         if ($request->has('device_id'))
-            $qianxun->monitor_points_id = $request->input('device_id');
+            $qianxun->device_id = $request->input('device_id');
         if ($request->has('monitor_account'))
-            $qianxun->monitor_points_id = $request->input('monitor_account');
+            $qianxun->monitor_account = $request->input('monitor_account');
         if ($request->has('monitor_account_pwd'))
-            $qianxun->monitor_points_id = $request->input('monitor_account_pwd');
+            $qianxun->monitor_account_pwd = $request->input('monitor_account_pwd');
         if ($request->has('monitor_points_id'))
-            $qianxun->monitor_points_id = $request->input('monitor_points_id');
+            $qianxun->monitor_points_id = $request->monitor_points_id;
         if ($request->has('monitor_points_name'))
-            $qianxun->monitor_points_id = $request->input('monitor_points_name');
+            $qianxun->monitor_points_name = $request->monitor_points_name;
         if ($request->has('sik'))
-            $qianxun->monitor_points_id = $request->input('sik');
+            $qianxun->sik = $request->sik;
         if ($request->has('sis'))
-            $qianxun->monitor_points_id = $request->input('sis');
+            $qianxun->sis = $request->sis;
         if ($request->has('stand_x'))
-            $qianxun->monitor_points_id = $request->input('stand_x');
+            $qianxun->stand_x = $request->stand_x;
         if ($request->has('stand_y'))
-            $qianxun->monitor_points_id = $request->input('stand_y');
+            $qianxun->stand_y = $request->stand_y;
         if ($request->has('stand_z'))
-            $qianxun->monitor_points_id = $request->input('stand_z');
+            $qianxun->stand_z = $request->stand_z;
 
         $qianxun->save();
 
