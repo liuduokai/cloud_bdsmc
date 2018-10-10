@@ -1592,6 +1592,25 @@ class PoiController extends Controller
         $cam->save();
         return response()->json(['message'=>'添加成功']);
     }
+    public function updateCameras(Request $request){
+        $uid = $request->uid;
+        $poi_id = $request->poi_id;
+        $cam = Camera::findOrFail($request->id);
+        $cam->uid = $uid;
+        $cam->poi_id = $poi_id;
+        $cam->save();
+        return response()->json(['message'=>'修改成功']);
+    }
+    public function delCameras(Request $request){
+        $cam = Camera::findOrFail($request->id);
+        $cam->delete();
+        return response()->json(['message'=>'删除成功']);
+    }
+    public function getCameras(Request $request){
+        $uid = $request->uid;
+        $cam = Camera::where('uid',$uid)->first();
+        return response()->json($cam);
+    }
     public function test(Request $request ,$q){
 
         $pinyin = new Pinyin();

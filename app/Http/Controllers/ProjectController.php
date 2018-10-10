@@ -298,13 +298,15 @@ class ProjectController extends Controller
 
     public function getQianXun(Request $request){
 
-        $this->validate($request, [
-            'device_id' => 'required',
-        ]);
+        if ($request->has('device_id')) {
 
+            $qianxun = QianXun::where('device_id', $request->device_id)->get();
 
-        $qianxun = QianXun::where('device_id',$request->device_id)->get();
+        }else{
 
+            $qianxun = QianXun::all();
+
+        }
 
         return response()->json($qianxun);
     }

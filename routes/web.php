@@ -305,9 +305,24 @@ $router->get('/getVideoPicByDate', ['middleware' => 'cors','uses' => 'PoiControl
 $router->options('/getVideoPicByDate', ['middleware' => 'cors','uses' => 'PoiController@getVideoPicByDate']);
 
 
+
+
 $router->post('/addCameras', ['middleware' => 'cors','uses' => 'PoiController@addCameras']);
 $router->get('/addCameras', ['middleware' => 'cors','uses' => 'PoiController@addCameras']);
 $router->options('/addCameras', ['middleware' => 'cors','uses' => 'PoiController@addCameras']);
+
+$router->post('/updateCameras', ['middleware' => 'cors','uses' => 'PoiController@updateCameras']);
+$router->get('/updateCameras', ['middleware' => 'cors','uses' => 'PoiController@updateCameras']);
+$router->options('/updateCameras', ['middleware' => 'cors','uses' => 'PoiController@updateCameras']);
+
+$router->post('/delCameras', ['middleware' => 'cors','uses' => 'PoiController@delCameras']);
+$router->get('/delCameras', ['middleware' => 'cors','uses' => 'PoiController@delCameras']);
+$router->options('/delCameras', ['middleware' => 'cors','uses' => 'PoiController@delCameras']);
+
+$router->post('/getCameras', ['middleware' => 'cors','uses' => 'PoiController@getCameras']);
+$router->get('/getCameras', ['middleware' => 'cors','uses' => 'PoiController@getCameras']);
+$router->options('/getCameras', ['middleware' => 'cors','uses' => 'PoiController@getCameras']);
+
 
 
 
