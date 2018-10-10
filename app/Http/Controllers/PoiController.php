@@ -1607,8 +1607,7 @@ class PoiController extends Controller
         return response()->json(['message'=>'删除成功']);
     }
     public function getCameras(Request $request){
-        $uid = $request->uid;
-        $cam = Camera::where('uid',$uid)->first();
+        $cam = Camera::where('poi_id',$request->poi_id)->get();
         return response()->json($cam);
     }
     public function test(Request $request ,$q){
