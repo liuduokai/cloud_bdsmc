@@ -20,3 +20,4 @@
 /bootstrap/
 /packages/
 /public/
+.env
