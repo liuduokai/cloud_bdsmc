@@ -66,6 +66,7 @@ class PoiController extends Controller
                 'listPoses',
                 'deviceData',
                 'test',
+                'listPois'
             ]]);
 
         DB::connection()->enableQueryLog();
@@ -211,8 +212,6 @@ class PoiController extends Controller
         $pinyin = new Pinyin();
 
         if ($this->guard()->user()->type == 1)
-            //$pois = Poi::where('project_id', $this->guard()->user()->project_id)->get();
-
             $pois =  Poi::all();
         else {
             $pois = Poi::where('project_id', $this->guard()->user()->project_id)->get();
@@ -223,18 +222,21 @@ class PoiController extends Controller
 
 
             $photos = $poi->photos;
+
+            unset($poi["photos"]);
             foreach ($photos as $photo) {
                 $photo["devices"] = $photo->photopostions;
             }
+            foreach ($photos as $v){
+                if($v->path != null){
+                    $test[] = ($v->path != null);
+                    $noNull[] = $v;
+                }
+            }
 
-            $poi["photos"] = $photos;
+            $poi["photos"] = $noNull;
             $poi["devices2"] = $poi->devices;
-
-            //$poi["photos"] = Photo::where('poi_id',$poi->id)->get();
-            //$poi["photos"] = \App\Photo::all();
-            //$queries    = DB::getQueryLog();
-            //$last_query = end($queries);
-            //dd($last_query);
+            return response()->json([$poi]);
         }
 
         return response()->json($pois);
@@ -1506,11 +1508,15 @@ class PoiController extends Controller
                             ->select('pois.project_id')
                             ->where('cameras.uid', '=', $file)
                             ->get();
+                        //return response()->json([''=>$project,''=>$file]);
+
                         foreach ($project as $item){
                             $cam_pro_id = $item->project_id;
                         }
-                        if($project_id ===$cam_pro_id){
-                            $dev_ids[] = $file;
+                        if(isset($cam_pro_id)) {
+                            if ($project_id === $cam_pro_id) {
+                                $dev_ids[] = $file;
+                            }
                         }
                     }
                 }
