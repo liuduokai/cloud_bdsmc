@@ -223,7 +223,7 @@ class PoiController extends Controller
 
             $photos = $poi->photos;
 
-            unset($poi["photos"]);
+
             foreach ($photos as $photo) {
                 $photo["devices"] = $photo->photopostions;
             }
@@ -233,10 +233,12 @@ class PoiController extends Controller
                     $noNull[] = $v;
                 }
             }
-
-            $poi["photos"] = $noNull;
+            if(isset($noNull)) {
+                unset($poi["photos"]);
+                $poi["photos"] = $noNull;
+            }
             $poi["devices2"] = $poi->devices;
-            return response()->json([$poi]);
+            //return response()->json([$poi]);
         }
 
         return response()->json($pois);
