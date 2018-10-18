@@ -545,18 +545,29 @@ class PoiController extends Controller
             //$insars = Insar::all();
             //return response()->json($insars);
         }
+        if ($this->guard()->user()->type == 3) {
+            $colors = DB::table('insar')->select('color')->where('mean_velocity','<',-20)->distinct()->get();
 
-        $colors = DB::table('insar')->select('color')->distinct()->get();
+            foreach ($colors as $color) {
+                $insars = DB::table('insar')->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g', 'mean_velocity')->where([['color', $color->color],['mean_velocity','<',-20]])->get();
+                $color->insars = $insars;
 
-        foreach ($colors as $color) {
-            $insars = DB::table('insar')->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g')->where('color', $color->color)->get();
-            $color->insars = $insars;
+            }
+
+
+            return response()->json($colors);
+        }else{
+            $colors = DB::table('insar')->select('color')->distinct()->get();
+
+            foreach ($colors as $color) {
+                $insars = DB::table('insar')->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g')->where('color', $color->color)->get();
+                $color->insars = $insars;
+
+            }
+
+            return response()->json($colors);
 
         }
-
-
-        return response()->json($colors);
-
 
         $err['error'] = 'error';
         return response()->json($err);

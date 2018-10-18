@@ -145,59 +145,111 @@ class ProjectController extends Controller
       return response()->json(['message' => 'del_ok']);
     }
 
-    public function getMapInfo()
+    public function getMapInfo(Request $request)
     {
         $projectId = $this->guard()->user()->project_id;
-        $project = Project::where('id', '=', $projectId)->get();
-        //$result = [];
-        foreach ($project as $item) {
-            $latlng = explode(',', $item->center_point);
-            $lat = (double)$latlng[0];
-            $lng = (double)$latlng[1];
-            /*$result[] = ['lat'=>$lat];
-            $result[] = ['lng'=>$lng];*/
-            $lt = explode(',', $item->lt_point);
-            $left = (double)$lt[0];
-            $top = (double)$lt[1];
-            $rd = explode(',', $item->rd_point);
-            $right = (double)$rd[0];
-            $down = (double)$rd[1];
-            /*$result[] = ['top'=>$top];
-            $result[] = ['right'=>$right];
-            $result[] = ['left'=>$left];
-            $result[] = ['bottom'=>$down];*/
-            $maxmin = explode(',', $item->map_change_lvl);
-            $min = (double)$maxmin[0];
-            $max = (double)$maxmin[1];
-            /*$result[] = ['maxZoom'=>$max];
-            $result[] =['minZoom'=>$min];
-            $result[] =['vp' =>$item->map_path];
-            $result[] =['vt'=>$item->sate_path];*/
-            $myfile = fopen($item->pro_bord_path, "r") or die("Unable to open file!");
-            $border_path = fread($myfile, filesize($item->pro_bord_path));
-            //$border = explode(',', $border_path);
-            //$result []=['border'=>$border_path];
-            /*if(!is_dir($item->map_path))
-                return response()->json(['error'=>'街道地图目录错误','path'=>$item->map_path],403);
-            if(!is_dir($item->sate_path))
-                return response()->json(['error'=>'卫星地图目录错误','path'=>$item->sate_path],403);*/
-            fclose($myfile);
-            $object = (object)[
-                'lat' => $lat,
-                'lng' => $lng,
-                'top' => $top,
-                'right' => $right,
-                'left' => $left,
-                'bottom' => $down,
-                'maxZoom' => $max,
-                'minZoom' => $min,
-                'vp' => $item->map_path,
-                'vt' => $item->sate_path,
-                'border' => $border_path,
-                'zom'=> $item->zom,
-            ];
+        if( $this->guard()->user()->type ==1 && $request->has('project_id')){
+            $project = Project::where('id', '=', $request->project_id)->get();
+            foreach ($project as $item) {
+                $latlng = explode(',', $item->center_point);
+                $lat = (double)$latlng[0];
+                $lng = (double)$latlng[1];
+                /*$result[] = ['lat'=>$lat];
+                $result[] = ['lng'=>$lng];*/
+                $lt = explode(',', $item->lt_point);
+                $left = (double)$lt[0];
+                $top = (double)$lt[1];
+                $rd = explode(',', $item->rd_point);
+                $right = (double)$rd[0];
+                $down = (double)$rd[1];
+                /*$result[] = ['top'=>$top];
+                $result[] = ['right'=>$right];
+                $result[] = ['left'=>$left];
+                $result[] = ['bottom'=>$down];*/
+                $maxmin = explode(',', $item->map_change_lvl);
+                $min = (double)$maxmin[0];
+                $max = (double)$maxmin[1];
+                /*$result[] = ['maxZoom'=>$max];
+                $result[] =['minZoom'=>$min];
+                $result[] =['vp' =>$item->map_path];
+                $result[] =['vt'=>$item->sate_path];*/
+                $myfile = fopen($item->pro_bord_path, "r") or die("Unable to open file!");
+                $border_path = fread($myfile, filesize($item->pro_bord_path));
+                //$border = explode(',', $border_path);
+                //$result []=['border'=>$border_path];
+                /*if(!is_dir($item->map_path))
+                    return response()->json(['error'=>'街道地图目录错误','path'=>$item->map_path],403);
+                if(!is_dir($item->sate_path))
+                    return response()->json(['error'=>'卫星地图目录错误','path'=>$item->sate_path],403);*/
+                fclose($myfile);
+                $object = (object)[
+                    'lat' => $lat,
+                    'lng' => $lng,
+                    'top' => $top,
+                    'right' => $right,
+                    'left' => $left,
+                    'bottom' => $down,
+                    'maxZoom' => $max,
+                    'minZoom' => $min,
+                    'vp' => $item->map_path,
+                    'vt' => $item->sate_path,
+                    'border' => $border_path,
+                    'zom' => $item->zom,
+                ];
+            }
+            return response()->json($object);
+        }else {
+            $project = Project::where('id', '=', $projectId)->get();
+            //$result = [];
+            foreach ($project as $item) {
+                $latlng = explode(',', $item->center_point);
+                $lat = (double)$latlng[0];
+                $lng = (double)$latlng[1];
+                /*$result[] = ['lat'=>$lat];
+                $result[] = ['lng'=>$lng];*/
+                $lt = explode(',', $item->lt_point);
+                $left = (double)$lt[0];
+                $top = (double)$lt[1];
+                $rd = explode(',', $item->rd_point);
+                $right = (double)$rd[0];
+                $down = (double)$rd[1];
+                /*$result[] = ['top'=>$top];
+                $result[] = ['right'=>$right];
+                $result[] = ['left'=>$left];
+                $result[] = ['bottom'=>$down];*/
+                $maxmin = explode(',', $item->map_change_lvl);
+                $min = (double)$maxmin[0];
+                $max = (double)$maxmin[1];
+                /*$result[] = ['maxZoom'=>$max];
+                $result[] =['minZoom'=>$min];
+                $result[] =['vp' =>$item->map_path];
+                $result[] =['vt'=>$item->sate_path];*/
+                $myfile = fopen($item->pro_bord_path, "r") or die("Unable to open file!");
+                $border_path = fread($myfile, filesize($item->pro_bord_path));
+                //$border = explode(',', $border_path);
+                //$result []=['border'=>$border_path];
+                /*if(!is_dir($item->map_path))
+                    return response()->json(['error'=>'街道地图目录错误','path'=>$item->map_path],403);
+                if(!is_dir($item->sate_path))
+                    return response()->json(['error'=>'卫星地图目录错误','path'=>$item->sate_path],403);*/
+                fclose($myfile);
+                $object = (object)[
+                    'lat' => $lat,
+                    'lng' => $lng,
+                    'top' => $top,
+                    'right' => $right,
+                    'left' => $left,
+                    'bottom' => $down,
+                    'maxZoom' => $max,
+                    'minZoom' => $min,
+                    'vp' => $item->map_path,
+                    'vt' => $item->sate_path,
+                    'border' => $border_path,
+                    'zom' => $item->zom,
+                ];
+            }
+            return response()->json($object);
         }
-        return response()->json($object);
     }
 
     public function addQianXun(Request $request){
