@@ -96,8 +96,8 @@ $router->options('/history', ['middleware' => 'cors','uses' => 'PoiController@hi
 $router->post('/updateSensor', ['middleware' => 'cors','uses' => 'PoiController@UpdateSensor']);
 $router->options('/updateSensor', ['middleware' => 'cors','uses' => 'PoiController@UpdateSensor']);
 
-// $router->get('/listProjects', ['middleware' => 'cors','uses' => 'ProjectController@listProjects']);
-// $router->options('/listProjects', ['middleware' => 'cors','uses' => 'ProjectController@listProjects']);
+$router->get('/listProjects', ['middleware' => 'cors','uses' => 'ProjectController@listProjects']);
+$router->options('/listProjects', ['middleware' => 'cors','uses' => 'ProjectController@listProjects']);
 
 $router->get('/listAlarms', ['middleware' => 'cors','uses' => 'AlarmController@listAlarms']);
 $router->options('/listAlarms', ['middleware' => 'cors','uses' => 'AlarmController@listAlarms']);
@@ -277,9 +277,15 @@ $router->post('/deviceData', ['middleware' => 'cors','uses' => 'PoiController@de
 $router->get('/deviceData', ['middleware' => 'cors','uses' => 'PoiController@deviceData']);
 $router->options('/deviceData', ['middleware' => 'cors','uses' => 'PoiController@deviceData']);
 
-$router->post('/test/{q}', ['middleware' => 'cors','uses' => 'PoiController@test']);
-$router->get('/test/{q}', ['middleware' => 'cors','uses' => 'PoiController@test']);
-$router->options('/test/{q}', ['middleware' => 'cors','uses' => 'PoiController@test']);
+$router->post('/deviceData2', ['middleware' => 'cors','uses' => 'PoiController@deviceData2']);
+$router->get('/deviceData2', ['middleware' => 'cors','uses' => 'PoiController@deviceData2']);
+$router->options('/deviceData2', ['middleware' => 'cors','uses' => 'PoiController@deviceData2']);
+
+
+
+$router->post('/test', ['middleware' => 'cors','uses' => 'PoiController@test']);
+$router->get('/test', ['middleware' => 'cors','uses' => 'PoiController@test']);
+$router->options('/test', ['middleware' => 'cors','uses' => 'PoiController@test']);
 
 
 $router->post('/login3', ['middleware' => 'cors','uses' => 'AuthController@login3']);

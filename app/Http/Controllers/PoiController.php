@@ -66,7 +66,8 @@ class PoiController extends Controller
                 'listPoses',
                 'deviceData',
                 'test',
-                'listPois'
+                'listPois',
+                'deviceData2',
             ]]);
 
         DB::connection()->enableQueryLog();
@@ -1504,6 +1505,148 @@ class PoiController extends Controller
         //echo $ip; */
         return response()->json(['error' => '请输入正确的用户名和密码', 'email' => $request->email, 'ip' => $ip], 401);
     }
+
+    public function deviceData2(Request $request){
+        $messages = [
+            'email.required' => '请填写用户名',
+            'password.required' => '请填写密码',
+        ];
+
+
+
+        $this->validate($request, [
+            'email' => 'required',
+            'password' => 'required',
+            'device_id' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ], $messages);
+
+
+
+        $device_id = $request->device_id;
+        $device_id=base_convert($device_id,16,10);
+        $device_id = $device_id*65536;
+        $device_id_1s = DB::table('devices')
+            ->join('pois','devices.poi_id','=','pois.id')
+            ->select('pois.*')
+            ->where([
+                ['devices.id2', '=', $device_id],
+                ['devices.deleted_at','=',NULL],
+            ])
+            ->take(1)
+            ->get();
+
+
+
+        foreach ($device_id_1s as $device_id_1){
+            $pid=$device_id_1->project_id;
+        }
+
+        //若未登陆过将账户加入缓存
+        if (Cache::has($request->email)) {
+        } else {
+            Cache::put($request->email, 1, 5);
+        }
+
+        //错误密码输入超过四次
+        if (Cache::get($request->email) < 4) {
+            $credentials = $request->only('email', 'password');
+
+            if($token = $this->guard()->attempt($credentials)){
+
+
+                $upid = $this->guard()->user()->project_id;
+                $type =$this->guard()->user()->type;
+
+
+                if ($upid === $pid || $type === 1 ) {
+
+
+                    Cache::forget($request->email);
+                    $start = date_create($request->start_time);
+                    $end = date_create($request->end_time);
+
+
+                    $datas = DB::table('sensors')
+                        ->join('devices','devices.id','=','sensors.device_id')
+                        ->join('displacementsensor1', 'sensors.id', '=', 'displacementsensor1.device_id')
+                        ->select('displacementsensor1.*','sensors.name')
+                        ->where([
+                            ['devices.id2', '=', $device_id],
+                            ['displacementsensor1.gps_time','>',$start],
+                            ['displacementsensor1.gps_time','<',$end],
+                            ['devices.deleted_at','=',NULL]
+                        ])
+                        ->groupby('displacementsensor1.gps_time','displacementsensor1.device_id')
+                        ->orderBy('displacementsensor1.gps_time','asc')
+                        ->get();
+
+
+                    foreach ($datas as $data){
+                        $result[$data->gps_time][]=$data;
+                    }
+
+                    foreach ($result as $resul){
+
+                        $format_data['id'] = 0;
+                        $format_data['deviceId'] = $request->device_id;
+
+                        foreach ($resul as $resu){
+                            switch ($resu->name){
+                                case '经度':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['longitude'] = $resu->displacement;
+                                    break;
+                                case '纬度':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['latitude'] = $resu->displacement;
+                                    break;
+                                case '海拔':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['altitude'] = $resu->displacement;
+                                    break;
+                                case '偏东':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['east'] = $resu->displacement;
+                                    break;
+                                case '偏北':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['north'] = $resu->displacement;
+                                    break;
+                                case '高程变化':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['elevationChange'] = $resu->displacement;
+                                    break;
+                            }
+                        }
+                        $result_datas[] = $format_data;
+                    }
+
+                    if(isset($result)) {
+                        return response()->json(['businessName' => '业务名称', 'data' => $result_datas,'serviceType'=>1,'system'=>'1','user'=>$this->guard()->user()->email]);
+                    }else{
+                        return response()->json(['error' => '该设备此时段不存在数据']);
+                    }
+                } else {
+
+                    return response()->json(['error' => '你不属于当前项目'], 401);
+
+                }
+            }else{
+
+                Cache::increment($request->email);
+
+            }
+        } else {
+
+            return response()->json(['error' => '输入密码错误次数过多'], 401);
+
+        }
+
+        return response()->json(['error' => '请输入正确的用户名和密码'], 401);
+    }
+
     public function getVideopic(Request $request){   //获取摄像头的最后一张图片
         $user_type =$this->guard()->user()->type;
         $project_id= $this->guard()->user()->project_id;
@@ -1629,9 +1772,149 @@ class PoiController extends Controller
         $cam = Camera::where('poi_id',$request->poi_id)->get();
         return response()->json($cam);
     }
-    public function test(Request $request ,$q){
+    public function test(Request $request ){
 
-        $pinyin = new Pinyin();
+
+        $messages = [
+            'email.required' => '请填写用户名',
+            'password.required' => '请填写密码',
+        ];
+
+
+
+        $this->validate($request, [
+            'email' => 'required',
+            'password' => 'required',
+            'device_id' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ], $messages);
+
+
+
+        $device_id = $request->device_id;
+        $device_id=base_convert($device_id,16,10);
+        $device_id = $device_id*65536;
+        $device_id_1s = DB::table('devices')
+            ->join('pois','devices.poi_id','=','pois.id')
+            ->select('pois.*')
+            ->where([
+                ['devices.id2', '=', $device_id],
+                ['devices.deleted_at','=',NULL],
+            ])
+            ->take(1)
+            ->get();
+
+
+
+        foreach ($device_id_1s as $device_id_1){
+            $pid=$device_id_1->project_id;
+        }
+
+        //若未登陆过将账户加入缓存
+        if (Cache::has($request->email)) {
+        } else {
+            Cache::put($request->email, 1, 5);
+        }
+
+        //错误密码输入超过四次
+        if (Cache::get($request->email) < 4) {
+            $credentials = $request->only('email', 'password');
+
+            if($token = $this->guard()->attempt($credentials)){
+
+
+                $upid = $this->guard()->user()->project_id;
+                $type =$this->guard()->user()->type;
+
+
+                if ($upid === $pid || $type === 1 ) {
+
+
+                    Cache::forget($request->email);
+                    $start = date_create($request->start_time);
+                    $end = date_create($request->end_time);
+
+
+                    $datas = DB::table('sensors')
+                        ->join('devices','devices.id','=','sensors.device_id')
+                        ->join('displacementsensor1', 'sensors.id', '=', 'displacementsensor1.device_id')
+                        ->select('displacementsensor1.*','sensors.name')
+                        ->where([
+                            ['devices.id2', '=', $device_id],
+                            ['displacementsensor1.gps_time','>',$start],
+                            ['displacementsensor1.gps_time','<',$end],
+                            ['devices.deleted_at','=',NULL]
+                        ])
+                        ->groupby('displacementsensor1.gps_time','displacementsensor1.device_id')
+                        ->orderBy('displacementsensor1.gps_time','asc')
+                        ->get();
+
+
+                    foreach ($datas as $data){
+                        $result[$data->gps_time][]=$data;
+                    }
+
+                    foreach ($result as $resul){
+
+                        $format_data['id'] = 0;
+                        $format_data['deviceId'] = $request->device_id;
+
+                        foreach ($resul as $resu){
+                            switch ($resu->name){
+                                case '经度':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['longitude'] = $resu->displacement;
+                                    break;
+                                case '纬度':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['latitude'] = $resu->displacement;
+                                    break;
+                                case '海拔':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['altitude'] = $resu->displacement;
+                                    break;
+                                case '偏东':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['east'] = $resu->displacement;
+                                    break;
+                                case '偏北':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['north'] = $resu->displacement;
+                                    break;
+                                case '高程变化':
+                                    $format_data['gpsTime'] = $resu->gps_time;
+                                    $format_data['elevationChange'] = $resu->displacement;
+                                    break;
+                            }
+                        }
+                        $result_datas[] = $format_data;
+                    }
+
+                    if(isset($result)) {
+                        return response()->json(['businessName' => '业务名称', 'data' => $result_datas,'serviceType'=>1,'system'=>'1','user'=>$this->guard()->user()->email]);
+                    }else{
+                        return response()->json(['error' => '该设备此时段不存在数据']);
+                    }
+                } else {
+
+                    return response()->json(['error' => '你不属于当前项目'], 401);
+
+                }
+            }else{
+
+                Cache::increment($request->email);
+
+            }
+        } else {
+
+            return response()->json(['error' => '输入密码错误次数过多'], 401);
+
+        }
+
+        return response()->json(['error' => '请输入正确的用户名和密码'], 401);
+
+        /*$pinyin = new Pinyin();
         $project_id = $this->guard()->user()->project_id;
         $sId = $q;
 
@@ -1658,7 +1941,7 @@ class PoiController extends Controller
                 $pois[] = $poi;
                 //$count++;
             }
-        }
+        }*/
 
         //return response()->json($pois);
 
