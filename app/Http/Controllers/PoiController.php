@@ -675,8 +675,36 @@ class PoiController extends Controller
                 list($m0, $s0) = explode(" ", $t);
                 list($m1, $s1) = explode(" ", $t1);
 
+
+
+
+                $temp_data =999999;
+                $l_time = 0;
+
+                foreach ($res as $res_decimatio){
+                    if($temp_data == 999999){
+                        $temp_data = $res_decimatio->displacement;
+                        $l_time  = $res_decimatio->gps_time;
+                    }else{
+                        $data_change['displacement'] =round($temp_data - $res_decimatio->displacement,2);
+                        $data_change['gps_time'] = $l_time;
+                        $data_change['device_id'] = $res_decimatio->device_id;
+                        $change[] = $data_change;
+
+                        $temp_data = $res_decimatio->displacement;
+                        $l_time = $res_decimatio->gps_time;
+                    }
+                }
+
+
+
+
+
+
                 $root["data"] = $res;
                 $root["elapsed time"] = (($s1 + $m1 - $s0 - $m0)) . " s";
+
+                $root['dataChange'] = $change;
 
                 return response()->json($root);
             } else {
@@ -805,6 +833,28 @@ class PoiController extends Controller
                     ->skip($id * $page_size)
                     ->take($page_size)
                     ->get();
+
+
+                $temp_data =999999;
+                $l_time = 0;
+
+                foreach ($res_decimation as $res_decimatio){
+                    if($temp_data == 999999){
+                        $temp_data = $res_decimatio->displacement;
+                        $l_time  = $res_decimatio->gps_time;
+                    }else{
+                        $data_change['displacement'] =round($temp_data - $res_decimatio->displacement,2);
+                        $data_change['gps_time'] = $l_time;
+                        $data_change['device_id'] = $res_decimatio->device_id;
+                        $change[] = $data_change;
+
+                        $temp_data = $res_decimatio->displacement;
+                        $l_time = $res_decimatio->gps_time;
+                    }
+                }
+
+
+
                 $st1 = microtime();
                 list($m0, $s0) = explode(" ", $st);
                 list($m1, $s1) = explode(" ", $st1);
@@ -821,6 +871,8 @@ class PoiController extends Controller
                 //$root['ratio'] = $ratio;
                 $root['page_size'] = $page_size;
 
+                $root['dataChange'] = $change;
+
                 return response()->json($root);
             }
 
@@ -833,7 +885,23 @@ class PoiController extends Controller
                     ->groupby(DB::raw('DATE_FORMAT(gps_time,"%Y-%m-%d")'))
                     ->take(30)
                     ->get();
-            return response()->json(['data'=>$all_datas]);
+            $temp_data =999999;
+            $l_time = 0;
+            foreach ($all_datas as $all_data){
+                if($temp_data == 999999){
+                    $temp_data = $all_data->displacement;
+                    $l_time  = $all_data->gps_time;
+                }else{
+                    $data_change['displacement'] =round($temp_data - $all_data->displacement,2);
+                    $data_change['gps_time'] = $l_time;
+                    $data_change['device_id'] = $all_data->device_id;
+                    $change[] = $data_change;
+
+                    $temp_data = $all_data->displacement;
+                    $l_time = $all_data->gps_time;
+                }
+            }
+            return response()->json(['data'=>$all_datas,'dataChange'=>$change]);
         } else {
             $err['error'] = 'type error';
             return response()->json($err);
