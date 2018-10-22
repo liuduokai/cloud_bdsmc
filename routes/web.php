@@ -347,3 +347,8 @@ $router->options('/updateQianXun', ['middleware' => 'cors','uses' => 'ProjectCon
 $router->post('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectController@getQianXun']);
 $router->get('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectController@getQianXun']);
 $router->options('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectController@getQianXun']);
+
+
+$router->post('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiController@acceptNBData']);
+$router->get('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiController@acceptNBData']);
+$router->options('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiController@acceptNBData']);

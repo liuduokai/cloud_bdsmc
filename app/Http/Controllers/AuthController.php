@@ -534,8 +534,8 @@ class AuthController extends Controller
         $user->phone = $request->input('phone');
       if($request->has('gender'))
         $user->gender = $request->input('gender');
-      if($request->has('project_name'))
-        $user->project_name = $request->input('project_name');
+      /*if($request->has('project_name'))
+        $user->project_name = $request->input('project_name');*/
       if($request->has('home'))
         $user->home = $request->input('home');
       if($request->has('id_number'))
@@ -929,10 +929,10 @@ class AuthController extends Controller
                 //$user->save();
                 return response()->json(['message'=>'修改密码成功']);
             }else {
-                return response()->json(['error'=>'验证码错误']);
+                return response()->json(['error'=>'验证码错误'],403);
             }
         }else {
-            return response()->json(['error'=>'请输入密码']);
+            return response()->json(['error'=>'请先获取验证码'],403);
         }
     }
 }

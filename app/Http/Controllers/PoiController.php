@@ -27,6 +27,10 @@ use \Bluerhinos\phpMQTT;
 use Overtrue\Pinyin\Pinyin;
 use App\PoiInfo;
 
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+
 include_once 'addUserLog.php';
 
 class PoiController extends Controller
@@ -68,6 +72,7 @@ class PoiController extends Controller
                 'test',
                 'listPois',
                 'deviceData2',
+                'acceptNBData',
             ]]);
 
         DB::connection()->enableQueryLog();
@@ -703,8 +708,8 @@ class PoiController extends Controller
 
                 $root["data"] = $res;
                 $root["elapsed time"] = (($s1 + $m1 - $s0 - $m0)) . " s";
-
-                $root['dataChange'] = $change;
+                if(isset($change))
+                    $root['dataChange'] = $change;
 
                 return response()->json($root);
             } else {
@@ -870,8 +875,8 @@ class PoiController extends Controller
                 $root['total_d'] = count($res_decimation);
                 //$root['ratio'] = $ratio;
                 $root['page_size'] = $page_size;
-
-                $root['dataChange'] = $change;
+                if(isset($change))
+                    $root['dataChange'] = $change;
 
                 return response()->json($root);
             }
@@ -901,6 +906,8 @@ class PoiController extends Controller
                     $l_time = $all_data->gps_time;
                 }
             }
+            if(!isset($change))
+                $change = [];
             return response()->json(['data'=>$all_datas,'dataChange'=>$change]);
         } else {
             $err['error'] = 'type error';
@@ -1840,10 +1847,60 @@ class PoiController extends Controller
         $cam = Camera::where('poi_id',$request->poi_id)->get();
         return response()->json($cam);
     }
+
+    public function acceptNBData(Request $request ){
+        $host= config('auth.authAmqpHost');
+        $port=config('auth.authAmqpPort');
+        $user=config('auth.authAmqpUser');
+        $password=config('auth.authAmqpPassword');
+        $vhost = config("auth.authAmqpVhost");
+        $connection = new AMQPStreamConnection($host, $port, $user, $password, $vhost);
+        $channel = $connection->channel();
+
+        //$channel->exchange_declare('topic_logs', 'topic', false, false, false);
+
+        $routing_key = 'annte';
+        $data = $request->getContent();
+        $data = json_encode($data);
+
+        $msg = new AMQPMessage($data);
+
+        $channel->basic_publish($msg, 'amq.topic', $routing_key);
+
+        echo " [x] Sent ",$routing_key,':',$data," \n";
+        return response()->json($request);
+    }
     public function test(Request $request ){
+        $host= config('auth.authAmqpHost');
+        $port=config('auth.authAmqpPort');
+        $user=config('auth.authAmqpUser');
+        $password=config('auth.authAmqpPassword');
+        $vhost = config("auth.authAmqpVhost");
+        $connection = new AMQPStreamConnection($host, $port, $user, $password, $vhost);
+        $channel = $connection->channel();
+
+        //$channel->exchange_declare('topic_logs', 'topic', false, false, false);
+
+        $routing_key = 'annte';
+        $data = json_encode($request->query());
+
+        $msg = new AMQPMessage($request);
+
+        $channel->basic_publish($msg, 'amq.topic', $routing_key);
+
+        echo " [x] Sent ",$routing_key,':',$data," \n";
+
+        $channel->close();
+        $connection->close();
+        $myfile = fopen("zzz", "w");
+        fwrite($myfile, $request);
+        fclose($myfile);
+        return response()->json($request);
+
+        //return response()->json($request);
 
 
-        $messages = [
+        /*$messages = [
             'email.required' => '请填写用户名',
             'password.required' => '请填写密码',
         ];
@@ -1980,7 +2037,7 @@ class PoiController extends Controller
 
         }
 
-        return response()->json(['error' => '请输入正确的用户名和密码'], 401);
+        return response()->json(['error' => '请输入正确的用户名和密码'], 401);*/
 
         /*$pinyin = new Pinyin();
         $project_id = $this->guard()->user()->project_id;
