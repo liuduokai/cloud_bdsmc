@@ -60,7 +60,7 @@ class ProjectController extends Controller
           // 'sate_lvl'=>'required',
           'map_path'=>'required',
           'map_change_lvl'=>'required',
-          'zom'=>'required',
+          //'zom'=>'required',
           // 'user_id'=>'required'
       ]);
 
@@ -73,14 +73,14 @@ class ProjectController extends Controller
       // $user->sate_lvl= $request->sate_lvl;
       $user->map_path= $request->map_path;
       $user->map_change_lvl = $request->map_change_lvl;
-      $user->zom = $request->zom;
+      //$user->zom = $request->zom;
       if ($request->has('user_id'))
         $user->user_id= $request->user_id;
       $user->save();
       addUserLog('addProject2',$this->guard()->user()->id,1);
             //return response()->json(['message' => 'error']);
       // addUserLog('addProject2',$this->guard()->user()->id,1);
-      return response()->json(['message' => 'add_ok','user'=>$user]);
+      return response()->json(['message' => 'add_ok','project'=>$user]);
     }
     public function addProjectFile2(Request $request){
         $this->validate($request, [

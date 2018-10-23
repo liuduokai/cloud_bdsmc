@@ -128,6 +128,7 @@ class AuthController extends Controller
               $users->home = $user['home'];     
             $users->save(); 
             addUserLog('addUserList',$this->guard()->user()->id,1);
+            return response()->json(['message' => 'add_ok']);
           }
         }
         if(count($errors)){
@@ -302,8 +303,8 @@ class AuthController extends Controller
     }
       if($request->has('home'))
         $user->home = $request->input('home');
-        if($request->has('type'))
-          $user->type = $request->input('type');
+      if($request->has('type'))
+        $user->type = $request->input('type');
       if($request->has('id_number'))
         $user->id_number = $request->input('id_number');
       if($request->has('gender'))
@@ -586,20 +587,19 @@ class AuthController extends Controller
         return response()->json(["phone"=>["手机号码没有注册"]],200);
 
       if($user->type == 1)
-      return response()->json(["phone"=>"管理员不能使用短信验证码登录"],200);
+        return response()->json(["phone"=>"管理员不能使用短信验证码登录"],200);
 
-        $pwd = strval(rand(0,9)).strval(rand(0,9)).strval(rand(0,9)).strval(rand(0,9));
-        //$pwd = "0780";
-        Cache::put('pwd_'.$request->phone, $pwd, 3);
-        $pwdObj = (object)null;
-        //$pwdObj->type = 1;
-        $pwdObj->phone = $request->phone;
-        $pwdObj->pwd = $pwd;
-        //event(new SmsEvent($pwdObj));
-        $this->amqpsms($pwdObj);
-        //dispatch(new MsgJob);
-        return response()->json([$request->phone => $pwd]);
-
+      $pwd = strval(rand(0,9)).strval(rand(0,9)).strval(rand(0,9)).strval(rand(0,9));
+      //$pwd = "0780";
+      Cache::put('pwd_'.$request->phone, $pwd, 3);
+      $pwdObj = (object)null;
+      //$pwdObj->type = 1;
+      $pwdObj->phone = $request->phone;
+      $pwdObj->pwd = $pwd;
+      //event(new SmsEvent($pwdObj));
+      $this->amqpsms($pwdObj);
+      //dispatch(new MsgJob);
+      return response()->json(['message'=>'send it']);
     }
     
     public function amqpsms($pwdObj)
@@ -621,7 +621,7 @@ class AuthController extends Controller
 
         $channel->basic_publish($msg, 'amq.topic', $routing_key);
 
-        echo " [x] Sent ",$routing_key,':',$data," \n";
+        //echo " [x] Sent ",$routing_key,':',$data," \n";
 
         $channel->close();
         $connection->close();

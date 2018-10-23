@@ -304,7 +304,7 @@ class PoiController extends Controller
         $pinyin = new Pinyin();
         $project_id = $this->guard()->user()->project_id;
         $sId = $q;
-///////////////////////////////////////////////////////////////
+
         $devices = Device::search($sId)
             ->where('devices.deleted_at', '=', NULL)
             ->get();
@@ -331,7 +331,7 @@ class PoiController extends Controller
                 }
             }
         }
-////////////////////////////////////////////////////////////////////////////
+
         //根据监测点名搜索
         if ($this->guard()->user()->type == 1)
             //$pois = Poi::where('project_id', $this->guard()->user()->project_id)->get();
@@ -1491,6 +1491,7 @@ class PoiController extends Controller
             'email.required' => '请填写用户名',
             'password.required' => '请填写密码',
         ];
+        $empty_object=(object)array();
         $ip = $request->getClientIp();
         $this->validate($request, [
             'email' => 'required',
@@ -1516,6 +1517,8 @@ class PoiController extends Controller
         foreach ($device_id_1s as $device_id_1){
             $pid=$device_id_1->project_id;
         }
+        if(!isset($pid))
+             return json_encode((object)null);
         //$device_id_1t= gettype($device_id_1);
         //$device_id_1= $device_id_1["project_id"];
         if (Cache::has($request->email)) {
@@ -1524,7 +1527,6 @@ class PoiController extends Controller
         }
         if (Cache::get($request->email) < 4) {
             $credentials = $request->only('email', 'password');
-
             if($token = $this->guard()->attempt($credentials)){
                 $upid = $this->guard()->user()->project_id;
                 $type =$this->guard()->user()->type;
@@ -1565,6 +1567,9 @@ class PoiController extends Controller
                     $temp_time = null;
                     foreach ($alarms as $alarm){
                        $result[$alarm->gps_time][]=$alarm;
+                    }
+                    if(!isset($result)){
+                        $result = json_encode((object)null);
                     }
                     return response()->json(['id'=>$request->device_id,'data'=>$result]);
                 } else {

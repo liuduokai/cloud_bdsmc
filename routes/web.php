@@ -164,11 +164,13 @@ $router->post('/listProjects2', ['middleware' => 'cors','uses' => 'ProjectContro
 $router->post('/addProject2', ['middleware' => 'cors','uses' => 'ProjectController@addProject2']);
 $router->post('/updateProject2', ['middleware' => 'cors','uses' => 'ProjectController@updateProject2']);
 $router->post('/delProject2', ['middleware' => 'cors','uses' => 'ProjectController@delProject2']);
+
 $router->get('/addProjectFile2', ['middleware' => 'cors','uses' => 'ProjectController@addProjectFile2']);
 $router->get('/listProjects2', ['middleware' => 'cors','uses' => 'ProjectController@listProjects2']);
 $router->get('/addProject2', ['middleware' => 'cors','uses' => 'ProjectController@addProject2']);
 $router->get('/updateProject2', ['middleware' => 'cors','uses' => 'ProjectController@updateProject2']);
 $router->get('/delProject2', ['middleware' => 'cors','uses' => 'ProjectController@delProject2']);
+
 $router->options('/addProjectFile2', ['middleware' => 'cors','uses' => 'ProjectController@addProjectFile2']);
 $router->options('/listProjects2', ['middleware' => 'cors','uses' => 'ProjectController@listProjects']);
 $router->options('/addProject2', ['middleware' => 'cors','uses' => 'ProjectController@addProject2']);

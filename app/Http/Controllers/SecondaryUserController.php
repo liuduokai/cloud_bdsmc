@@ -33,6 +33,7 @@ class SecondaryUserController extends Controller
     {
       $key = "example_key";
       $token = $request->header('Authorization');
+      //return response()->json($token);
       $tmp = explode(" ",$token);
 
       if(count($tmp)==2)
