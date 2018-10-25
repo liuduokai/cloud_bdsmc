@@ -123,14 +123,14 @@ class ProjectController extends Controller
       $user->map_change_lvl = $request->map_change_lvl;
       if ($request->has('user_id'))
           $user->user_id= $request->user_id;
-      if ($request->has('zom'))
-        $user->zom = $request->zom;
+      /*if ($request->has('zom'))
+        $user->zom = $request->zom;*/
       $user->save();
 
       //addUserLog('addProject2',$this->guard()->user()->id,1);
             //return response()->json(['message' => 'error']);
         addUserLog('updateProject2',$this->guard()->user()->id,3);
-        return response()->json(['message' => 'update_ok','user'=>$user]);
+        return response()->json(['message' => 'update_ok','project'=>$user]);
     }
 
     public function delProject2(Request $request)

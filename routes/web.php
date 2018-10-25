@@ -257,7 +257,8 @@ $router->get('/alarmsCamera', ['middleware' => 'cors','uses' => 'AlarmController
 
 $router->options('/UsersLog', ['middleware' => 'cors','uses' => 'AuthController@UsersLog']);
 $router->get('/UsersLog', ['middleware' => 'cors','uses' => 'AuthController@UsersLog']);
-$router->get('/addUserLog', ['middleware' => 'cors','uses' => 'AuthController@addUserLog']);
+$router->post('/addUserLog', ['middleware' => 'cors','uses' => 'AuthController@addUserLog']);
+$router->options('/addUserLog', ['middleware' => 'cors','uses' => 'AuthController@addUserLog']);
 
 
 

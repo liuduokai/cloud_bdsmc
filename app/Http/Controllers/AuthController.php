@@ -738,8 +738,8 @@ class AuthController extends Controller
       echo "Authorization：".$Authorization;
       echo "</br>";
       */
-      //$url = "http://218.76.43.93:9580/nmc/rest/realstream?sign=".$sign;
-        $url = "http://192.168.1.140:9580/nmc/rest/realstream?sign=".$sign;
+        $url = "http://218.76.43.93:9580/nmc/rest/realstream?sign=".$sign;
+        //$url = "http://192.168.1.140:9580/nmc/rest/realstream?sign=".$sign;
         $header = array(
             'Accept:' . 'Accept:application/json',
             'Content-Type:Accept:application/json;charset=utf-8',
@@ -878,10 +878,19 @@ class AuthController extends Controller
         return response(urldecode($result));
     }
     public function addUserLog(Request $request /* $action,$id,$type */){
-     
-      return addUserLog($request->action,$request->id,$request->type);
-     
-      
+        $this->validate($request, [
+            'action' => 'required',
+            'id' => 'required',
+            'type' => 'required',
+
+        ]);
+
+
+        if($this->guard()->user()->type == 1) {
+            addUserLog($request->action, $request->id, $request->type);
+        }
+        return response()->json(['message'=>'add_ok']);
+
     }
     public function UsersLog(Request $request){
       if($this->guard()->user()->type == 1){

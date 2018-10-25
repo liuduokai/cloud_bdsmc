@@ -685,12 +685,13 @@ class PoiController extends Controller
 
                 $temp_data =999999;
                 $l_time = 0;
-
+                $flag =1;
                 foreach ($res as $res_decimatio){
                     if($temp_data == 999999){
                         $temp_data = $res_decimatio->displacement;
                         $l_time  = $res_decimatio->gps_time;
                     }else{
+                        $flag = 0;
                         $data_change['displacement'] =round($temp_data - $res_decimatio->displacement,2);
                         $data_change['gps_time'] = $l_time;
                         $data_change['device_id'] = $res_decimatio->device_id;
@@ -700,12 +701,16 @@ class PoiController extends Controller
                         $l_time = $res_decimatio->gps_time;
                     }
                 }
-
-
-
-
-
-
+                if($flag) {
+                    foreach ($res as $res_decimatio) {
+                        $temp_data = $res_decimatio->displacement;
+                        $l_time = $res_decimatio->gps_time;
+                        $data_change['displacement'] = round($res_decimatio->displacement, 2);
+                        $data_change['gps_time'] = $l_time;
+                        $data_change['device_id'] = $res_decimatio->device_id;
+                        $change[] = $data_change;
+                    }
+                }
                 $root["data"] = $res;
                 $root["elapsed time"] = (($s1 + $m1 - $s0 - $m0)) . " s";
                 if(isset($change))
@@ -842,12 +847,13 @@ class PoiController extends Controller
 
                 $temp_data =999999;
                 $l_time = 0;
-
+                $flag_1 = 1;
                 foreach ($res_decimation as $res_decimatio){
                     if($temp_data == 999999){
                         $temp_data = $res_decimatio->displacement;
                         $l_time  = $res_decimatio->gps_time;
                     }else{
+                        $flag_1 = 0;
                         $data_change['displacement'] =round($temp_data - $res_decimatio->displacement,2);
                         $data_change['gps_time'] = $l_time;
                         $data_change['device_id'] = $res_decimatio->device_id;
@@ -857,7 +863,16 @@ class PoiController extends Controller
                         $l_time = $res_decimatio->gps_time;
                     }
                 }
-
+                if($flag_1) {
+                    foreach ($res as $res_decimatio) {
+                        $temp_data = $res_decimatio->displacement;
+                        $l_time = $res_decimatio->gps_time;
+                        $data_change['displacement'] = round($res_decimatio->displacement, 2);
+                        $data_change['gps_time'] = $l_time;
+                        $data_change['device_id'] = $res_decimatio->device_id;
+                        $change[] = $data_change;
+                    }
+                }
 
 
                 $st1 = microtime();
@@ -892,11 +907,13 @@ class PoiController extends Controller
                     ->get();
             $temp_data =999999;
             $l_time = 0;
+            $flag_2 = 1;
             foreach ($all_datas as $all_data){
                 if($temp_data == 999999){
                     $temp_data = $all_data->displacement;
                     $l_time  = $all_data->gps_time;
                 }else{
+                    $flag_2 = 0;
                     $data_change['displacement'] =round($temp_data - $all_data->displacement,2);
                     $data_change['gps_time'] = $l_time;
                     $data_change['device_id'] = $all_data->device_id;
@@ -906,6 +923,17 @@ class PoiController extends Controller
                     $l_time = $all_data->gps_time;
                 }
             }
+            if($flag_2) {
+                foreach ($res as $res_decimatio) {
+                    $temp_data = $res_decimatio->displacement;
+                    $l_time = $res_decimatio->gps_time;
+                    $data_change['displacement'] = round($res_decimatio->displacement, 2);
+                    $data_change['gps_time'] = $l_time;
+                    $data_change['device_id'] = $res_decimatio->device_id;
+                    $change[] = $data_change;
+                }
+            }
+
             if(!isset($change))
                 $change = [];
             return response()->json(['data'=>$all_datas,'dataChange'=>$change]);
@@ -1061,15 +1089,21 @@ class PoiController extends Controller
         } else {
             return response()->json(['error' => '该id已经存在，无法继续添加']);
         }
+
+
         $device_id = $request->id2;
         $device_id = $device_id / 65536;
         $device_id = base_convert($device_id, 10, 16);
         $device_id = sprintf("%012d", $device_id);
+
+
         $device = new Device;
         $device->poi_id = $request->poi_id;
         $device->name = $request->name;
         $device->id2 = $request->id2;
         $device->mac =$device_id;
+
+
         if ($request->has('lng'))
             $device->lng = $request->input('lng');
         if ($request->has('lat'))
@@ -1082,16 +1116,22 @@ class PoiController extends Controller
             $device->unit = $request->input('unit');
         if ($request->has('type'))
             $device->type = $request->input('type');
+
+
         $device->save();
+
+
         $to_getid = DB::table('devices')
             ->select("devices.*")
             ->where([["devices.id2", $id2],
                 ['devices.deleted_at', '=', NULL],
             ])
             ->get();
+
         foreach ($to_getid as $item){
             $return_id = $item->id;
         }
+
         $type = $request->input('type');
         if ($type == 5) {
             $result = DB::table('devices')
@@ -1102,16 +1142,23 @@ class PoiController extends Controller
                 ->get();
             foreach ($result as $rs)
                 $id = $rs->id;
+
+
             $device_id = $request->id2;
             $device_id = $device_id / 65536;
             $device_id = base_convert($device_id, 10, 16);
             $device_id = sprintf("%012d", $device_id);
+
+
             DB::table('qianxun')
                 ->insert(['device_id' => $device_id]);
+
+
             DB::table('gnss_device_info')
                 ->insert(
                     ['device_hex_id' => $device_id,'device_table_id' => $id]
                     );
+
             //return response()->json(['message' => 'in it']);
         }
         //ddUserLog('addDevice2', $this->guard()->user()->id, 1);
@@ -1207,7 +1254,9 @@ class PoiController extends Controller
         $sensor->device_id = $request->device_id;
         $sensor->name = $request->name;
         $sensor->id2 = $request->id2;
-        $sensor->unit = $request->unit;
+
+        if ($request->has('unit'))
+            $sensor->unit = $request->unit;
 
         if ($request->has('up1'))
             $sensor->up1 = $request->up1;
@@ -1451,7 +1500,7 @@ class PoiController extends Controller
         $info = PoiInfo::where('poi_id', $request->poi_id);
         $info->delete();
         addUserLog('delPoiInfo', $this->guard()->user()->id, 2);
-        return response()->json(['message' => 'del_ok', 'type' => gettype($info)]);
+        return response()->json(['message' => 'del_ok']);
     }
 
     public function updatePoiInfo(Request $request)
