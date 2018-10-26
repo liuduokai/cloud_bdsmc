@@ -355,3 +355,7 @@ $router->options('/getQianXun', ['middleware' => 'cors','uses' => 'ProjectContro
 $router->post('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiController@acceptNBData']);
 $router->get('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiController@acceptNBData']);
 $router->options('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiController@acceptNBData']);
+
+$router->post('/addMoreDevice', ['middleware' => 'cors','uses' => 'PoiController@addMoreDevice']);
+$router->get('/addMoreDevice', ['middleware' => 'cors','uses' => 'PoiController@addMoreDevice']);
+$router->options('/addMoreDevice', ['middleware' => 'cors','uses' => 'PoiController@addMoreDevice']);

@@ -1924,8 +1924,80 @@ class PoiController extends Controller
         echo " [x] Sent ",$routing_key,':',$data," \n";
         return response()->json($request);
     }
+
+    public function addMoreDevice(Request $request){
+
+        $device_datas = $request->devices;
+        $poi_id  = $request->poi_id;
+        $device_datas = json_decode($device_datas);
+
+
+        foreach ($device_datas as $key => $value){
+
+            $mac = $key;
+            $name = $value;
+
+
+            $id2 = intval($mac);
+            $id2 = base_convert($id2,16,10);
+            $id2 = $id2 *65536;
+
+
+            $device = new Device;
+            $device->poi_id = $poi_id;
+            $device->mac = $mac;
+            $device->name = $name;
+            $device->id2 = $id2;
+
+
+            $device->save();
+        }
+        //$poi_id = $device_datas->poi_id;
+
+        /*$device_id=base_convert($device_id,16,10);
+        $device_id = $device_id*65536;*/
+
+        return response()->json(["message"=>'add_success']);
+    }
+
+
     public function test(Request $request ){
-        $host= config('auth.authAmqpHost');
+
+        $device_datas = $request->devices;
+        $poi_id  = $request->poi_id;
+        $device_datas = json_decode($device_datas);
+        foreach ($device_datas as $key => $value){
+            $mac = $key;
+            $name = $value;
+
+
+            $id2 = intval($mac);
+            $id2 = base_convert($id2,16,10);
+            $id2 = $id2 *65536;
+
+
+            $device = new Device;
+
+
+            $device->poi_id = $poi_id;
+            $device->mac = $mac;
+            $device->name = $name;
+            $device->id2 = $id2;
+
+
+            $device->save();
+        }
+        //$poi_id = $device_datas->poi_id;
+
+        /*$device_id=base_convert($device_id,16,10);
+        $device_id = $device_id*65536;*/
+
+        return response()->json(["message"=>'add_success']);
+
+
+
+
+        /*$host= config('auth.authAmqpHost');
         $port=config('auth.authAmqpPort');
         $user=config('auth.authAmqpUser');
         $password=config('auth.authAmqpPassword');
@@ -1952,7 +2024,7 @@ class PoiController extends Controller
         return response()->json($request);
 
         //return response()->json($request);
-
+*/
 
         /*$messages = [
             'email.required' => '请填写用户名',
