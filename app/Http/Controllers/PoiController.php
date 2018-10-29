@@ -1776,17 +1776,94 @@ class PoiController extends Controller
         return response()->json(['error' => '请输入正确的用户名和密码'], 401);
     }
 
-    public function getVideopic(Request $request){   //获取摄像头的最后一张图片
+    public function testDeviceData(Request $request){
+
+        //$empty_object = (object)array();
+
+        $ip = $request->getClientIp();
+
+
+        $this->validate($request, [
+            'device_id' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+        ]);
+
+
+        $device_id = $request->device_id;
+        $device_id = base_convert($device_id, 16, 10);
+        $device_id = $device_id * 65536;
+
+
+        $device_id_1s = DB::table('devices')
+            ->join('pois', 'devices.poi_id', '=', 'pois.id')
+            ->select('pois.*')
+            ->where([
+                ['devices.id2', '=', $device_id],
+                ['devices.deleted_at', '=', NULL],
+            ])
+            ->take(1)
+            ->get();
+
+
+        foreach ($device_id_1s as $device_id_1) {
+            $pid = $device_id_1->project_id;
+        }
+        if (!isset($pid))
+            return json_encode((object)null);
+
+
+        $upid = $this->guard()->user()->project_id;
+        $type = $this->guard()->user()->type;
+
+
+        if ($upid === $pid || $type === 1) {
+            $start = date_create($request->start_time);
+            $end = date_create($request->end_time);
+
+
+            $alarms = DB::table('sensors')
+                ->join('devices', 'devices.id', '=', 'sensors.device_id')
+                ->join('displacementsensor1', 'sensors.id', '=', 'displacementsensor1.device_id')
+                ->select('displacementsensor1.*', 'sensors.name')
+                ->where([
+                    ['devices.id2', '=', $device_id],
+                    ['displacementsensor1.gps_time', '>', $start],
+                    ['displacementsensor1.gps_time', '<', $end],
+                    ['devices.deleted_at', '=', NULL]
+                ])
+                ->groupby('displacementsensor1.gps_time', 'displacementsensor1.device_id')
+                ->orderBy('displacementsensor1.gps_time', 'asc')
+                ->get();
+
+            $temp_time = null;
+
+            foreach ($alarms as $alarm) {
+                $result[$alarm->gps_time][] = $alarm;
+            }
+
+            if (!isset($result)) {
+                $result = json_encode((object)null);
+            }
+
+            return response()->json(['id' => $request->device_id, 'data' => $result]);
+        } else {
+            return response()->json(['$device_id_1s' => $device_id_1s, 'pid' => $pid, 'upid' => $upid, 'error' => '你不属于当前项目', 'email' => $request->email, 'ip' => $ip], 401);
+        }
+
+    }
+
+    public function getVideopic(Request $request){
         $user_type =$this->guard()->user()->type;
         $project_id= $this->guard()->user()->project_id;
-        $root_dir = '/mnt/myshare/SNAPSHOT/';               //服务器中路径
-        $server_dir = '/VideoData/SNAPSHOT/';               //前端需要的路径
+        $root_dir = '/mnt/myshare/SNAPSHOT/';
+        $server_dir = '/VideoData/SNAPSHOT/';
         if (is_dir($root_dir)) {
             $mydir = dir($root_dir);
             while ($file = $mydir->read()) {
                 if ($file != "." && $file != "..") {
                     if ($user_type === 1) {
-                        $dev_ids[] = $file;             //所有设备uid
+                        $dev_ids[] = $file;
                     } else {
                         $project = DB::table('cameras')
                             ->join('pois', 'pois.id', '=', 'cameras.poi_id')

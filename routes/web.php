@@ -359,3 +359,7 @@ $router->options('/acceptNBData', ['middleware' => 'cors','uses' => 'PoiControll
 $router->post('/addMoreDevice', ['middleware' => 'cors','uses' => 'PoiController@addMoreDevice']);
 $router->get('/addMoreDevice', ['middleware' => 'cors','uses' => 'PoiController@addMoreDevice']);
 $router->options('/addMoreDevice', ['middleware' => 'cors','uses' => 'PoiController@addMoreDevice']);
+
+$router->post('/testDeviceData', ['middleware' => 'cors','uses' => 'PoiController@testDeviceData']);
+$router->get('/testDeviceData', ['middleware' => 'cors','uses' => 'PoiController@testDeviceData']);
+$router->options('/testDeviceData', ['middleware' => 'cors','uses' => 'PoiController@testDeviceData']);
