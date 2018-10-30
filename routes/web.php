@@ -379,3 +379,7 @@ $router->options('/updateDeciveTest', ['middleware' => 'cors','uses' => 'PoiCont
 $router->post('/getDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@getDeciveTest']);
 $router->get('/getDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@getDeciveTest']);
 $router->options('/getDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@getDeciveTest']);
+
+$router->post('/addMoreDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeciveTest']);
+$router->get('/addMoreDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeciveTest']);
+$router->options('/addMoreDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeciveTest']);

@@ -2077,6 +2077,10 @@ class PoiController extends Controller
             $device_test->device_name = $request->device_name;
         }
 
+        if ($request->has('test_status')){
+            $device_test->test_status = $request->test_status;
+        }
+
 
         $device_test->save();
 
@@ -2136,11 +2140,40 @@ class PoiController extends Controller
             $device_test->device_name = $request->device_name;
         }
 
+        if ($request->has('test_status')){
+            $device_test->test_status = $request->test_status;
+        }
+
 
         $device_test->save();
 
 
         return response()->json(['message'=>'修改成功']);
+    }
+
+    public function addMoreDeciveTest(Request $request){
+
+
+        $device_test_datas = $request->devices_test;
+        $device_datas = json_decode($device_test_datas);
+
+
+        foreach ($device_datas as $key => $value){
+
+            $mac = $key;
+            $name = $value;
+
+
+            $device_test = new Device_test();
+            $device_test->device_hex_id = $mac;
+            $device_test->device_name = $name;
+
+
+            $device_test->save();
+        }
+
+
+        return response()->json(['message'=>'添加成功']);
     }
 
 
