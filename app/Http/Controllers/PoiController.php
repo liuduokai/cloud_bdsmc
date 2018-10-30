@@ -23,6 +23,7 @@ use App\Photo;
 use App\PhotoPostion;
 use App\Insar;
 use App\InsarData;
+use App\Device_test;
 use \Bluerhinos\phpMQTT;
 use Overtrue\Pinyin\Pinyin;
 use App\PoiInfo;
@@ -1162,6 +1163,11 @@ class PoiController extends Controller
             //return response()->json(['message' => 'in it']);
         }
         //ddUserLog('addDevice2', $this->guard()->user()->id, 1);
+
+        DB::table('gnss_device_info')->insertGetId([
+            'stand_x' => 0,'stand_y' => 0,'stand_z' => 0,'device_hex_id' => $device_id
+        ]);
+
         return response()->json(['message' => 'add_ok','id'=>$return_id]);
         /*}else{
             return response()->json(['error' => '该id已经存在，无法继续添加']);
@@ -2035,6 +2041,106 @@ class PoiController extends Controller
         $device_id = $device_id*65536;*/
 
         return response()->json(["message"=>'add_success']);
+    }
+
+    public function addDeciveTest(Request $request){
+
+
+        $device_test = new Device_test();
+
+
+        if ($request->has('device_table_id')){
+            $device_test->device_table_id = $request->device_table_id;
+        }
+
+        if ($request->has('test_start_time')){
+            $device_test->test_start_time = $request->test_start_time;
+        }
+
+        if ($request->has('test_end_time')){
+            $device_test->test_end_time = $request->test_end_time;
+        }
+
+        if ($request->has('test_result')){
+            $device_test->test_result = $request->test_result;
+        }
+
+        if ($request->has('online')){
+            $device_test->online = $request->online;
+        }
+
+        if ($request->has('device_hex_id')){
+            $device_test->device_hex_id = $request->device_hex_id;
+        }
+
+        if ($request->has('device_name')){
+            $device_test->device_name = $request->device_name;
+        }
+
+
+        $device_test->save();
+
+
+        return response()->json(['message'=>'添加成功']);
+    }
+
+    public function getDeciveTest(Request $request){
+
+        if ($request->has('device_hex_id')){
+
+            return response()->json(Device_test::where('device_hex_id',$request->device_hex_id)->get());
+
+        }else{
+
+            return response()->json(Device_test::all());
+
+        }
+    }
+
+    public function delDeciveTest(Request $request){
+        Device_test::findOrFail($request->id)->delete();
+        return response()->json(['message'=>'删除成功']);
+    }
+
+    public function updateDeciveTest(Request $request){
+
+
+        $device_test = Device_test::findOrFail($request->id);
+
+
+        if ($request->has('device_table_id')){
+            $device_test->device_table_id = $request->device_table_id;
+        }
+
+        if ($request->has('test_start_time')){
+            $device_test->test_start_time = $request->test_start_time;
+        }
+
+        if ($request->has('test_end_time')){
+            $device_test->test_end_time = $request->test_end_time;
+        }
+
+        if ($request->has('test_result')){
+            $device_test->test_result = $request->test_result;
+        }
+
+        if ($request->has('online')){
+            $device_test->online = $request->online;
+        }
+
+        if ($request->has('device_hex_id')){
+            $device_test->device_hex_id = $request->device_hex_id;
+        }
+
+        if ($request->has('device_name')){
+            $device_test->device_name = $request->device_name;
+        }
+
+
+        $device_test->save();
+
+
+        return response()->json(['message'=>'修改成功']);
     }
 
 
