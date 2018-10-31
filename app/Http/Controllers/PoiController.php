@@ -1075,11 +1075,15 @@ class PoiController extends Controller
             'name' => 'required',
             'id2' => 'required|numeric|unique:devices,id2,,,deleted_at,NULL',
         ]);
+
+
         /*$id2 = $request->id2;
         $result = DB::table('devices')
             ->where("devices.id2", $id2)
             ->exists();
         if (!$result) {*/
+
+
         $id2 = $request->id2;
         $result = DB::table('devices')
             ->where([["devices.id2", $id2],
@@ -1092,17 +1096,17 @@ class PoiController extends Controller
         }
 
 
-        $device_id = $request->id2;
-        $device_id = $device_id / 65536;
-        $device_id = base_convert($device_id, 10, 16);
-        $device_id = sprintf("%012d", $device_id);
+        $device_mac = $request->id2;
+        $device_mac = $device_mac / 65536;
+        $device_mac = base_convert($device_mac, 10, 16);
+        $device_mac = sprintf("%012d", $device_mac);
 
 
         $device = new Device;
         $device->poi_id = $request->poi_id;
         $device->name = $request->name;
         $device->id2 = $request->id2;
-        $device->mac =$device_id;
+        $device->mac =$device_mac;
 
 
         if ($request->has('lng'))
@@ -1121,57 +1125,32 @@ class PoiController extends Controller
 
         $device->save();
 
+        $device_id = $device->id;
 
-        $to_getid = DB::table('devices')
-            ->select("devices.*")
-            ->where([["devices.id2", $id2],
-                ['devices.deleted_at', '=', NULL],
-            ])
-            ->get();
+        $device_type = substr($device_mac,0,4);
 
-        foreach ($to_getid as $item){
-            $return_id = $item->id;
-        }
-
-        $type = $request->input('type');
-        if ($type == 5) {
-            $result = DB::table('devices')
-                ->select("devices.*")
-                ->where([["devices.id2", $id2],
-                    ['devices.deleted_at', '=', NULL],
-                ])
-                ->get();
-            foreach ($result as $rs)
-                $id = $rs->id;
-
-
-            $device_id = $request->id2;
-            $device_id = $device_id / 65536;
-            $device_id = base_convert($device_id, 10, 16);
-            $device_id = sprintf("%012d", $device_id);
-
-
-            DB::table('qianxun')
-                ->insert(['device_id' => $device_id]);
-
-
-            DB::table('gnss_device_info')
-                ->insert(
-                    ['device_hex_id' => $device_id,'device_table_id' => $id]
+        switch ($device_type){
+            case '0003':
+                DB::table('qianxun')
+                    ->insert(['device_id' => $device_mac]);
+                DB::table('gnss_device_info')
+                    ->insert(
+                        ['device_hex_id' => $device_mac,'device_table_id' => $device_id]
                     );
-
-            //return response()->json(['message' => 'in it']);
+                break;
+            case '0005':
+                DB::table('crack_device_info')
+                    ->insert(['device_hex_id' => $device_mac]);
+                break;
         }
-        //ddUserLog('addDevice2', $this->guard()->user()->id, 1);
 
-        DB::table('gnss_device_info')->insertGetId([
-            'stand_x' => 0,'stand_y' => 0,'stand_z' => 0,'device_hex_id' => $device_id
-        ]);
 
-        return response()->json(['message' => 'add_ok','id'=>$return_id]);
-        /*}else{
-            return response()->json(['error' => '该id已经存在，无法继续添加']);
-        }*/
+
+        //return response()->json(gettype($device_type));
+
+        return response()->json(['message' => 'add_ok','id'=>$device_id]);
+
+
     }
 
     public function updateDevice2(Request $request)
@@ -2043,7 +2022,7 @@ class PoiController extends Controller
         return response()->json(["message"=>'add_success']);
     }
 
-    public function addDeciveTest(Request $request){
+    public function addDeviceTest(Request $request){
 
 
         $device_test = new Device_test();
@@ -2088,7 +2067,7 @@ class PoiController extends Controller
         return response()->json(['message'=>'添加成功']);
     }
 
-    public function getDeciveTest(Request $request){
+    public function getDeviceTest(Request $request){
 
         if ($request->has('device_hex_id')){
 
@@ -2101,12 +2080,12 @@ class PoiController extends Controller
         }
     }
 
-    public function delDeciveTest(Request $request){
+    public function delDeviceTest(Request $request){
         Device_test::findOrFail($request->id)->delete();
         return response()->json(['message'=>'删除成功']);
     }
 
-    public function updateDeciveTest(Request $request){
+    public function updateDeviceTest(Request $request){
 
 
         $device_test = Device_test::findOrFail($request->id);
@@ -2151,7 +2130,7 @@ class PoiController extends Controller
         return response()->json(['message'=>'修改成功']);
     }
 
-    public function addMoreDeciveTest(Request $request){
+    public function addMoreDeviceTest(Request $request){
 
 
         $device_test_datas = $request->devices_test;
@@ -2178,8 +2157,11 @@ class PoiController extends Controller
 
 
     public function test(Request $request ){
+        $str = $request->str;
+        $str = substr($str,0,3);
+        return response()->json($str);
 
-        $device_datas = $request->devices;
+        /*$device_datas = $request->devices;
         $poi_id  = $request->poi_id;
         $device_datas = json_decode($device_datas);
         foreach ($device_datas as $key => $value){
@@ -2201,14 +2183,14 @@ class PoiController extends Controller
             $device->id2 = $id2;
 
 
-            $device->save();
-        }
+            $device->save();*/
+        //}
         //$poi_id = $device_datas->poi_id;
 
         /*$device_id=base_convert($device_id,16,10);
         $device_id = $device_id*65536;*/
 
-        return response()->json(["message"=>'add_success']);
+        //return response()->json(["message"=>'add_success']);
 
 
 

@@ -364,22 +364,22 @@ $router->post('/testDeviceData', ['middleware' => 'cors','uses' => 'PoiControlle
 $router->get('/testDeviceData', ['middleware' => 'cors','uses' => 'PoiController@testDeviceData']);
 $router->options('/testDeviceData', ['middleware' => 'cors','uses' => 'PoiController@testDeviceData']);
 
-$router->post('/addDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addDeciveTest']);
-$router->get('/addDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addDeciveTest']);
-$router->options('/addDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addDeciveTest']);
+$router->post('/addDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addDeviceTest']);
+$router->get('/addDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addDeviceTest']);
+$router->options('/addDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addDeviceTest']);
 
-$router->post('/delDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@delDeciveTest']);
-$router->get('/delDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@delDeciveTest']);
-$router->options('/delDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@delDeciveTest']);
+$router->post('/delDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@delDeviceTest']);
+$router->get('/delDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@delDeviceTest']);
+$router->options('/delDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@delDeviceTest']);
 
-$router->post('/updateDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@updateDeciveTest']);
-$router->get('/updateDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@updateDeciveTest']);
-$router->options('/updateDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@updateDeciveTest']);
+$router->post('/updateDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@updateDeviceTest']);
+$router->get('/updateDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@updateDeviceTest']);
+$router->options('/updateDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@updateDeviceTest']);
 
-$router->post('/getDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@getDeciveTest']);
-$router->get('/getDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@getDeciveTest']);
-$router->options('/getDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@getDeciveTest']);
+$router->post('/getDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@getDeviceTest']);
+$router->get('/getDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@getDeviceTest']);
+$router->options('/getDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@getDeviceTest']);
 
-$router->post('/addMoreDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeciveTest']);
-$router->get('/addMoreDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeciveTest']);
-$router->options('/addMoreDeciveTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeciveTest']);
+$router->post('/addMoreDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeviceTest']);
+$router->get('/addMoreDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeviceTest']);
+$router->options('/addMoreDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeviceTest']);

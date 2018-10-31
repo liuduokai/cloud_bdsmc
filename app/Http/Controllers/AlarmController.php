@@ -148,6 +148,7 @@ class AlarmController extends Controller
         ->select('alarmsDevice.*',
          'devices.name as name',
          'devices.id as id',
+            'devices.mac as mac',
          'pois.name as poi_name',
          'pois.location as poi_location')
         ->where('devices.id2',$request->id2)
@@ -176,6 +177,7 @@ class AlarmController extends Controller
         ->select('alarmsDevice.*',
          'devices.name as name',
          'devices.id as id',
+            'devices.mac as mac',
          'pois.name as poi_name',
          'pois.location as poi_location')
         ->where('devices.id',$request->id)
@@ -204,6 +206,7 @@ class AlarmController extends Controller
         ->select('alarmsDevice.*',
          'devices.name as name',
          'devices.id as id',
+            'devices.mac as mac',
          'pois.name as poi_name',
          'pois.location as poi_location')
         ->where('alarmsDevice.type',$request->lvl)
@@ -247,6 +250,7 @@ class AlarmController extends Controller
         ->select('alarmsDevice.*',
          'devices.name as name',
             'devices.id as id',
+            'devices.mac as mac',
          'pois.name as poi_name',
          'pois.location as poi_location')
          ->where([
@@ -290,7 +294,7 @@ class AlarmController extends Controller
         $alarms = DB::table('pois')
               ->join('devices', 'devices.poi_id', '=', 'pois.id')
               ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-              ->select('alarmsDevice.*', 'devices.id as id','devices.name as name', 'pois.name as poi_name', 'pois.location as poi_location')
+              ->select('alarmsDevice.*', 'devices.id as id','devices.mac as mac','devices.name as name', 'pois.name as poi_name', 'pois.location as poi_location')
               ->whereIn('pois.id',$poiIds)
               ->skip($request->ps * $request->pn)
               ->take($request->ps)
@@ -325,6 +329,7 @@ class AlarmController extends Controller
          'alarmsSensor.*',
          'devices.name as name',
             'devices.id as id',
+            'devices.mac as mac',
          'sensors.name as sensor_name',
          'pois.name as poi_name', 
          'pois.location as poi_location',
@@ -370,6 +375,7 @@ class AlarmController extends Controller
          'alarmsSensor.*',
          'devices.name as name',
             'devices.id as id',
+            'devices.mac as mac',
          'sensors.name as sensor_name',
          'pois.name as poi_name', 
          'pois.location as poi_location',
@@ -413,6 +419,7 @@ class AlarmController extends Controller
          'alarmsSensor.*',
          'devices.name as name',
             'devices.id as id',
+            'devices.mac as mac',
          'sensors.name as sensor_name',
          'pois.name as poi_name', 
          'pois.location as poi_location',
@@ -470,6 +477,7 @@ class AlarmController extends Controller
           'alarmsSensor.*',
           'devices.name as name',
               'devices.id as id',
+              'devices.mac as mac',
           'sensors.name as sensor_name',
           'pois.name as poi_name', 
           'pois.location as poi_location',
@@ -519,6 +527,7 @@ class AlarmController extends Controller
            'alarmsSensor.*',
            'devices.name as name',
               'devices.id as id',
+              'devices.mac as mac',
            'sensors.name as sensor_name',
            'pois.name as poi_name', 
            'pois.location as poi_location',
@@ -572,6 +581,7 @@ class AlarmController extends Controller
              'alarmsSensor.*',
              'devices.name as name',
                 'devices.id as id',
+                'devices.mac as mac',
              'sensors.name as sensor_name',
              'pois.name as poi_name', 
              'pois.location as poi_location',
