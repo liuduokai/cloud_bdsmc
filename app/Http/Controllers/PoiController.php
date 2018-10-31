@@ -1187,8 +1187,13 @@ class PoiController extends Controller
         ]);
 
         $device = Device::findOrFail(intval($request->id));
+
+        $sensors = Sensor::where('device_id',$request->id)->get();
+        foreach ($sensors as $sensor){
+            $sensor->delete();
+        }
         $device->delete();
-        addUserLog('delDevice2', $this->guard()->user()->id, 2);
+        //addUserLog('delDevice2', $this->guard()->user()->id, 2);
         return response()->json(['message' => 'del_ok']);
     }
 
@@ -1224,7 +1229,10 @@ class PoiController extends Controller
 
         $id2 = $request->id2;
         $result = DB::table('sensors')
-            ->where("sensors.id2", $id2)
+            ->where([
+                ['sensors.id2', $id2],
+                ['sensors.deleted_at', '=', NULL]
+            ])
             ->exists();
         if (!$result) {
         } else {
