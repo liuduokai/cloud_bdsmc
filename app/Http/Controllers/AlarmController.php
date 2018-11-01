@@ -120,676 +120,256 @@ class AlarmController extends Controller
             'ps' => 'required',  //page_size
       ]);
 
-      /* if($this->guard()->user()->type == 1){
-        $pois=$this->guard()->user()->project->pois;
-      }else{
-        $pois=$this->guard()->user()->pois;
+      $sql_where = array();
+      if($request->has('mac')){
+          $sql_part_mac = ['devices.mac','=',$request->mac];
+          array_push($sql_where,$sql_part_mac);
       }
 
-      $poiIds = [];
-      foreach ($pois as $poi) {
-        array_push($poiIds, $poi->id);
+      if($request->has('type')){
+          $sql_part_lvl = ['alarmsDevice.type','=',$request->type];
+          array_push($sql_where,$sql_part_lvl);
       }
 
-      $alarms = DB::table('pois')
-            ->join('devices', 'devices.poi_id', '=', 'pois.id')
-            ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-            ->select('alarmsDevice.*', 'devices.name as name', 'pois.name as poi_name', 'pois.location as poi_location')
-            ->whereIn('pois.id',$poiIds)
+      if($request->has('starttime') ||$request->has('endtime') ){
+
+          if($request->has('starttime') && $request->has('endtime')){
+              $start = date_create($request->starttime);
+              $end = date_create($request->endtime);
+          }elseif($request->has('endtime')){
+              $start = date_create('1970-01-01 00:00:00');
+              $end = date_create($request->endtime);
+          }else{
+              $start = date_create($request->starttime);
+              $end = date_create();
+          }
+
+
+          $sql_part_time_s = ['alarmsDevice.time','>',$start];
+          $sql_part_time_e =['alarmsDevice.time','<',$end];
+
+          array_push($sql_where,$sql_part_time_s);
+          array_push($sql_where,$sql_part_time_e);
+
+      }
+        $user_type = $this->guard()->user()->type;
+        $project_id = $this->guard()->user()->project->id;
+        if($user_type == 1){
+
+        }else{
+            $sql_part_project = ['pois.project_id','=',$project_id];
+            array_push($sql_where,$sql_part_project);
+        }
+
+        $result = DB::table('alarmsDevice')
+            ->join('devices', 'devices.id', '=', 'alarmsDevice.device_id')
+            ->join('pois','pois.id','=','devices.poi_id')
+            ->select(
+                'alarmsDevice.*',
+                'devices.id as id',
+                'devices.mac as mac',
+                'devices.name as name',
+                'pois.name as poi_name',
+                'pois.location as poi_location'
+            )
+            ->where($sql_where)
             ->skip($request->ps * $request->pn)
             ->take($request->ps)
             ->get();
-
-      return response()->json($alarms); */
-      if($request->has('id2')){
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name',
-         'devices.id as id',
-            'devices.mac as mac',
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-        ->where('devices.id2',$request->id2)
-        ->orderBy('alarmsDevice.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name', 
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-        ->where('devices.id2',$request->id2)
-        ->count();
-
-       $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-       return response()->json($retalarm);
-      }elseif($request->has('id')){
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name',
-         'devices.id as id',
-            'devices.mac as mac',
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-        ->where('devices.id',$request->id)
-        ->orderBy('alarmsDevice.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name', 
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-        ->where('devices.id',$request->id)
-        ->count();
-
-       $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-       return response()->json($retalarm);
-      }elseif($request->has('lvl')){
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name',
-         'devices.id as id',
-            'devices.mac as mac',
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-        ->where('alarmsDevice.type',$request->lvl)
-        ->orderBy('alarmsDevice.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name', 
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-         ->where('alarmsDevice.type',$request->lvl)
-        ->count(); 
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-        return response()->json($retalarm);
-
-      }elseif($request->has('starttime') || $request->has('endtime')){
-        if($request->has('starttime') && $request->has('endtime')){             //若只输入了开始时间或结束时间，自动将开始时间补全为1970年1月1日（UTC/GMT的午夜）
-          $start = date_create($request->starttime);                            //或将结束时间补全为当前时间
-          $end = date_create($request->endtime);
-        }elseif($request->has('endtime')){
-          $start = date_create('1970-01-01 00:00:00');
-          $end = date_create($request->endtime);
-        }else{
-          $start = date_create($request->starttime);
-          $end = date_create();
-        }
-       
-        if($start > $end)                                                       //若输入的开始时间大于结束时间
-          return 'wrong time';
-  
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-        ->select('alarmsDevice.*',
-         'devices.name as name',
-            'devices.id as id',
-            'devices.mac as mac',
-         'pois.name as poi_name',
-         'pois.location as poi_location')
-         ->where([
-         ['alarmsDevice.time','>',$start],
-         ['alarmsDevice.time','<',$end],
-         ])
-         ->orderBy('alarmsDevice.time', 'desc')
-         ->skip($request->ps * $request->pn)
-         ->take($request->ps)
-         ->get();
-
-        $totalCount = DB::table('pois')
-            ->join('devices', 'devices.poi_id', '=', 'pois.id')
-            ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-            ->select('alarmsDevice.*',
-             'devices.name as name', 
-             'pois.name as poi_name', 
-             'pois.location as poi_location')
-              ->where([
-                ['alarmsDevice.time','>',$start],
-                ['alarmsDevice.time','<',$end],
-              ])
-              ->count();
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-        return response()->json($retalarm);
-
-
-      }else{
-        if($this->guard()->user()->type == 1){
-          $pois=$this->guard()->user()->project->pois;
-        }else{
-          $pois=$this->guard()->user()->pois;
-        }
-  
-        $poiIds = [];
-        foreach ($pois as $poi) {
-          array_push($poiIds, $poi->id);
-        }
-  
-        $alarms = DB::table('pois')
-              ->join('devices', 'devices.poi_id', '=', 'pois.id')
-              ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-              ->select('alarmsDevice.*', 'devices.id as id','devices.mac as mac','devices.name as name', 'pois.name as poi_name', 'pois.location as poi_location')
-              ->whereIn('pois.id',$poiIds)
-              ->skip($request->ps * $request->pn)
-              ->take($request->ps)
-              ->get();
-
-         $totalCount = DB::table('pois')
-              ->join('devices', 'devices.poi_id', '=', 'pois.id')
-              ->join('alarmsDevice', 'devices.id', '=', 'alarmsDevice.device_id')
-              ->select('alarmsDevice.*', 'devices.name as name', 'pois.name as poi_name', 'pois.location as poi_location')
-              ->whereIn('pois.id',$poiIds)
-              ->count();
-  
-          $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-          return response()->json($retalarm);
-      }
+        $count =  DB::table('alarmsDevice')
+            ->join('devices', 'devices.id', '=', 'alarmsDevice.device_id')
+            ->join('pois','pois.id','=','devices.poi_id')
+            ->select(
+                'alarmsDevice.*',
+                'devices.id as id',
+                'devices.mac as mac',
+                'devices.name as name',
+                'pois.name as poi_name',
+                'pois.location as poi_location'
+            )
+            ->where($sql_where)
+            ->count();
+        return response()->json(['count'=>$count,'result'=>$result]);
 
     }
 
     public function alarmsSensor(Request $request)  
-    {                        
-      $this->validate($request, [
-        'pn' => 'required',  //page_num
-        'ps' => 'required',  //page_size
-      ]);
-      if($request->has('id2')){                          //根据id查询，需要参数id
-        
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name',
-            'devices.id as id',
-            'devices.mac as mac',
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->where('devices.id2',$request->id2)
-        ->orderBy('alarmsSensor.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
+    {
+        $this->validate($request, [
+            'pn' => 'required',  //page_num
+            'ps' => 'required',  //page_size
+        ]);
 
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name', 
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->where('devices.id2',$request->id2)
-        ->count();
 
-       $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
+        $sql_where = array();
 
-       return response()->json($retalarm);
-      }
-
-      if($request->has('id')){                          //根据id查询，需要参数id
-        
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name',
-            'devices.id as id',
-            'devices.mac as mac',
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->where('sensors.device_id',$request->id)
-        ->orderBy('alarmsSensor.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name', 
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->where('sensors.device_id',$request->id)
-        ->count();
-
-       $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-       return response()->json($retalarm);
-      }elseif($request->has('lvl')){                                    //根据报警等级查询，需要参数lvl
-
-        $alarms = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name',
-            'devices.id as id',
-            'devices.mac as mac',
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->where('alarmsSensor.type',$request->lvl)
-        ->orderBy('alarmsSensor.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name', 
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->where('alarmsSensor.type',$request->lvl)
-        ->count(); 
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-        return response()->json($retalarm);
-      }elseif($request->has('starttime') || $request->has('endtime')){          //根据时间查询，需要参数starttime or endtime
-        
-        if($request->has('starttime') && $request->has('endtime')){             //若只输入了开始时间或结束时间，自动将开始时间补全为1970年1月1日（UTC/GMT的午夜）
-          $start = date_create($request->starttime);                            //或将结束时间补全为当前时间
-          $end = date_create($request->endtime);
-        }elseif($request->has('endtime')){
-          $start = date_create('1970-01-01 00:00:00');
-          $end = date_create($request->endtime);
-        }else{
-          $start = date_create($request->starttime);
-          $end = date_create();
+        if ($request->has('mac')) {
+            $sql_part_mac = ['devices.mac', '=', $request->mac];
+            array_push($sql_where, $sql_part_mac);
         }
-       
-        if($start > $end)                                                       //若输入的开始时间大于结束时间
-          return 'wrong time';
-  
-        $alarms = DB::table('pois')
-          ->join('devices', 'devices.poi_id', '=', 'pois.id')
-          ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-          ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-          ->select(
-          'alarmsSensor.*',
-          'devices.name as name',
-              'devices.id as id',
-              'devices.mac as mac',
-          'sensors.name as sensor_name',
-          'pois.name as poi_name', 
-          'pois.location as poi_location',
-          'sensors.up1',
-          'sensors.down1',
-          'sensors.up2',
-          'sensors.down2')
-         ->where([
-         ['alarmsSensor.time','>',$start],
-         ['alarmsSensor.time','<',$end],
-         ])
-         ->orderBy('alarmsSensor.time', 'desc')
-         ->skip($request->ps * $request->pn)
-         ->take($request->ps)
-         ->get();
 
-        $totalCount = DB::table('pois')
-            ->join('devices', 'devices.poi_id', '=', 'pois.id')
-            ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-            ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
+        if ($request->has('type')) {
+            $sql_part_lvl = ['alarmsSensor.type', '=', $request->type];
+            array_push($sql_where, $sql_part_lvl);
+        }
+
+        if ($request->has('starttime') || $request->has('endtime')) {
+
+            if ($request->has('starttime') && $request->has('endtime')) {
+                $start = date_create($request->starttime);
+                $end = date_create($request->endtime);
+            } elseif ($request->has('endtime')) {
+                $start = date_create('1970-01-01 00:00:00');
+                $end = date_create($request->endtime);
+            } else {
+                $start = date_create($request->starttime);
+                $end = date_create();
+            }
+
+
+            $sql_part_time_s = ['alarmsSensor.time', '>', $start];
+            $sql_part_time_e = ['alarmsSensor.time', '<', $end];
+
+            array_push($sql_where, $sql_part_time_s);
+            array_push($sql_where, $sql_part_time_e);
+
+        }
+        $user_type = $this->guard()->user()->type;
+        $project_id = $this->guard()->user()->project->id;
+        if ($user_type == 1) {
+
+        } else {
+            $sql_part_project = ['pois.project_id', '=', $project_id];
+            array_push($sql_where, $sql_part_project);
+        }
+
+        $result = DB::table('alarmsSensor')
+            ->join('sensors', 'sensors.id', '=', 'alarmsSensor.sensor_id')
+            ->join('devices', 'devices.id', '=', 'sensors.device_id')
+            ->join('pois', 'pois.id', '=', 'devices.poi_id')
             ->select(
-             'alarmsSensor.*',
-             'devices.name as name', 
-             'sensors.name as sensor_name',
-             'pois.name as poi_name', 
-             'pois.location as poi_location',
-             'sensors.up1',
-             'sensors.down1',
-             'sensors.up2',
-             'sensors.down2')
-              ->where([
-                ['alarmsSensor.time','>',$start],
-                ['alarmsSensor.time','<',$end],
-              ])
-              ->count();
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-        return response()->json($retalarm);
-
-      }elseif($request->has('poiid')){                                    //根据监测点查询，需要参数poiid
-      
-          $alarms = DB::table('pois')
-          ->join('devices', 'devices.poi_id', '=', 'pois.id')
-          ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-          ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-          ->select(
-           'alarmsSensor.*',
-           'devices.name as name',
-              'devices.id as id',
-              'devices.mac as mac',
-           'sensors.name as sensor_name',
-           'pois.name as poi_name', 
-           'pois.location as poi_location',
-           'sensors.up1',
-           'sensors.down1',
-           'sensors.up2',
-           'sensors.down2')
-          ->where('pois.id',$request->poiid)
-          ->orderBy('alarmsSensor.time', 'desc')
-          ->skip($request->ps * $request->pn)
-          ->take($request->ps)
-          ->get();
-  
-         $totalCount = DB::table('pois')
-         ->join('devices', 'devices.poi_id', '=', 'pois.id')
-         ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-         ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-         ->select(
-          'alarmsSensor.*',
-          'devices.name as name', 
-          'sensors.name as sensor_name',
-          'pois.name as poi_name', 
-          'pois.location as poi_location',
-          'sensors.up1',
-          'sensors.down1',
-          'sensors.up2',
-          'sensors.down2')
-         ->where('pois.id',$request->poiid)
-         ->count();
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-        return response()->json($retalarm);
-        
-      }else{                                                        //若未传入查询参数
-        if($this->guard()->user()->type == 1){
-          $pois=$this->guard()->user()->project->pois;
-        }else{
-         $pois=$this->guard()->user()->pois;
-        }
-
-        $poiIds = [];
-        foreach ($pois as $poi) {
-          array_push($poiIds, $poi->id);
-        }
-
-        $alarms = DB::table('pois')
-            ->join('devices', 'devices.poi_id', '=', 'pois.id')
-            ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-            ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-            ->select(
-             'alarmsSensor.*',
-             'devices.name as name',
+                'alarmsSensor.*',
+                'devices.name as name',
                 'devices.id as id',
                 'devices.mac as mac',
-             'sensors.name as sensor_name',
-             'pois.name as poi_name', 
-             'pois.location as poi_location',
-             'sensors.up1',
-             'sensors.down1',
-             'sensors.up2',
-             'sensors.down2')
-            ->whereIn('poi_id',$poiIds)
-            ->orderBy('alarmsSensor.time', 'desc')
+                'sensors.name as sensor_name',
+                'pois.name as poi_name',
+                'pois.location as poi_location',
+                'sensors.up1',
+                'sensors.down1',
+                'sensors.up2',
+                'sensors.down2'
+            )
+            ->where($sql_where)
             ->skip($request->ps * $request->pn)
             ->take($request->ps)
             ->get();
-         
-        $totalCount = DB::table('pois')
-        ->join('devices', 'devices.poi_id', '=', 'pois.id')
-        ->join('sensors', 'devices.id', '=', 'sensors.device_id')
-        ->join('alarmsSensor', 'sensors.id', '=', 'alarmsSensor.sensor_id')
-        ->select(
-         'alarmsSensor.*',
-         'devices.name as name', 
-         'sensors.name as sensor_name',
-         'pois.name as poi_name', 
-         'pois.location as poi_location',
-         'sensors.up1',
-         'sensors.down1',
-         'sensors.up2',
-         'sensors.down2')
-        ->whereIn('poi_id',$poiIds)
-         ->count();
+        $count = DB::table('alarmsSensor')
+            ->join('sensors', 'sensors.id', '=', 'alarmsSensor.sensor_id')
+            ->join('devices', 'devices.id', '=', 'sensors.device_id')
+            ->join('pois', 'pois.id', '=', 'devices.poi_id')
+            ->select(
+                'alarmsSensor.*',
+                'devices.name as name',
+                'devices.id as id',
+                'devices.mac as mac',
+                'sensors.name as sensor_name',
+                'pois.name as poi_name',
+                'pois.location as poi_location',
+                'sensors.up1',
+                'sensors.down1',
+                'sensors.up2',
+                'sensors.down2'
+            )
+            ->where($sql_where)
+            ->count();
+        return response()->json(['count' => $count, 'result' => $result]);
 
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-        return response()->json($retalarm);
-        
-        return response()->json($alarms);
-      }
+
+
     }
 
     public function alarmsCamera(Request $request)
     {
+        $this->validate($request, [
+            'pn' => 'required',  //page_num
+            'ps' => 'required',  //page_size
+        ]);
 
-      $this->validate($request, [
-        'pn' => 'required',  //page_num
-        'ps' => 'required',  //page_size
-       ]);
-       if($request->has('id2')){
-        $alarms = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where('cameras.id2',$request->id2)
-        ->orderBy('alarmsCamera.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
 
-        $totalCount = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where('cameras.id2',$request->id2)
-        ->count();
+        $sql_where = array();
 
-      $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-      return response()->json($retalarm);
-      }elseif($request->has('id')){
-        $alarms = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where('alarmsCamera.camera_id',$request->id)
-        ->orderBy('alarmsCamera.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where('alarmsCamera.camera_id',$request->id)
-        ->count();
-
-      $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-      return response()->json($retalarm);
-      }elseif($request->has('lvl')){
-        $alarms = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where('alarmsCamera.type',$request->lvl)
-        ->orderBy('alarmsCamera.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where('alarmsCamera.type',$request->lvl)
-        ->count(); 
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-
-        return response()->json($retalarm);
-
-      }elseif($request->has('starttime') || $request->has('endtime')){
-        if($request->has('starttime') && $request->has('endtime')){             //若只输入了开始时间或结束时间，自动将开始时间补全为1970年1月1日（UTC/GMT的午夜）
-          $start = date_create($request->starttime);                            //或将结束时间补全为当前时间
-          $end = date_create($request->endtime);
-        }elseif($request->has('endtime')){
-          $start = date_create('1970-01-01 00:00:00');
-          $end = date_create($request->endtime);
-        }else{
-          $start = date_create($request->starttime);
-          $end = date_create();
+        if ($request->has('mac')) {
+            $sql_part_mac = ['cameras.uid', '=', $request->mac];
+            array_push($sql_where, $sql_part_mac);
         }
-      
-        if($start > $end)                                                       //若输入的开始时间大于结束时间
-          return 'wrong time';
 
-        $alarms = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where([
-        ['alarmsCamera.time','>',$start],
-        ['alarmsCamera.time','<',$end],
-        ])
-        ->orderBy('alarmsCamera.time', 'desc')
-        ->skip($request->ps * $request->pn)
-        ->take($request->ps)
-        ->get();
-
-        $totalCount = DB::table('pois')
-        ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-        ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-        ->select('alarmsCamera.*', 
-        'cameras.name as name',
-        'pois.name as poi_name', 
-        'pois.location as poi_location')
-        ->where([
-        ['alarmsCamera.time','>',$start],
-        ['alarmsCamera.time','<',$end],
-        ])
-        ->count();
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-        return response()->json($retalarm);
-
-      }else{  
-          if($this->guard()->user()->type == 1){
-            $pois=$this->guard()->user()->project->pois;
-          }else{
-            $pois=$this->guard()->user()->pois;
-          }
-
-          $poiIds = [];
-          foreach ($pois as $poi) {
-            array_push($poiIds, $poi->id);
-          }
-
-          $alarms = DB::table('pois')
-             ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-             ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-             ->select('alarmsCamera.*', 'cameras.name as name','pois.name as poi_name', 'pois.location as poi_location')
-             ->whereIn('poi_id',$poiIds)
-             ->orderBy('alarmsCamera.time', 'desc')
-             ->skip($request->ps * $request->pn)
-             ->take($request->ps)
-             ->get();
-
-          $totalCount = DB::table('pois')
-          ->join('cameras', 'cameras.poi_id', '=', 'pois.id')
-          ->join('alarmsCamera', 'cameras.id', '=', 'alarmsCamera.camera_id')
-          ->select('alarmsCamera.*', 'cameras.name as name','pois.name as poi_name', 'pois.location as poi_location')
-          ->whereIn('poi_id',$poiIds)
-          ->orderBy('alarmsCamera.time', 'desc')
-          ->count();
-
-        $retalarm=['totalCount'=>$totalCount,'alarms'=>$alarms];
-        return response()->json($retalarm);
-
-          return response()->json($alarms);
+        if ($request->has('type')) {
+            $sql_part_lvl = ['alarmsCamera.type', '=', $request->type];
+            array_push($sql_where, $sql_part_lvl);
         }
+
+        if ($request->has('starttime') || $request->has('endtime')) {
+
+            if ($request->has('starttime') && $request->has('endtime')) {
+                $start = date_create($request->starttime);
+                $end = date_create($request->endtime);
+            } elseif ($request->has('endtime')) {
+                $start = date_create('1970-01-01 00:00:00');
+                $end = date_create($request->endtime);
+            } else {
+                $start = date_create($request->starttime);
+                $end = date_create();
+            }
+
+
+            $sql_part_time_s = ['alarmsCamera.time', '>', $start];
+            $sql_part_time_e = ['alarmsCamera.time', '<', $end];
+
+            array_push($sql_where, $sql_part_time_s);
+            array_push($sql_where, $sql_part_time_e);
+
+        }
+        $user_type = $this->guard()->user()->type;
+        $project_id = $this->guard()->user()->project->id;
+        if ($user_type == 1) {
+
+        } else {
+            $sql_part_project = ['pois.project_id', '=', $project_id];
+            array_push($sql_where, $sql_part_project);
+        }
+        //return response()->json($project_id);
+        $result = DB::table('alarmsCamera')
+            ->join('cameras', 'cameras.id', '=', 'alarmsCamera.camera_id')
+            ->join('pois', 'pois.id', '=', 'cameras.poi_id')
+            ->select(
+                'alarmsCamera.*',
+                'cameras.name as name',
+                'cameras.id as id',
+                'cameras.uid as uid',
+                'pois.name as poi_name',
+                'pois.location as poi_location'
+            )
+            //->where($sql_where)
+            ->skip($request->ps * $request->pn)
+            ->take($request->ps)
+            ->get();
+        $count = DB::table('alarmsCamera')
+            ->join('cameras', 'cameras.id', '=', 'alarmsCamera.camera_id')
+            ->join('pois', 'pois.id', '=', 'cameras.poi_id')
+            ->select(
+                'alarmsCamera.*',
+                'cameras.name as name',
+                'cameras.id as id',
+                'cameras.uid as uid',
+                'pois.name as poi_name',
+                'pois.location as poi_location'
+            )
+            ->where($sql_where)
+            ->count();
+        return response()->json(['count' => $count, 'result' => $result]);
+
+
     }
 /*
     public function listAlarms(Request $request)
