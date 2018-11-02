@@ -910,6 +910,9 @@ class PoiController extends Controller
             $l_time = 0;
             $flag_2 = 1;
             foreach ($all_datas as $all_data){
+                $all_data->displacement = floatval($all_data->displacement);
+            }
+            foreach ($all_datas as $all_data){
                 if($temp_data == 999999){
                     $temp_data = $all_data->displacement;
                     $l_time  = $all_data->gps_time;
@@ -1099,7 +1102,7 @@ class PoiController extends Controller
         $device_mac = $request->id2;
         $device_mac = $device_mac / 65536;
         $device_mac = base_convert($device_mac, 10, 16);
-        $device_mac = sprintf("%012d", $device_mac);
+        $device_mac = sprintf("%012s", $device_mac);
 
 
         $device = new Device;
@@ -1143,6 +1146,8 @@ class PoiController extends Controller
                     ->insert(['device_hex_id' => $device_mac]);
                 break;
         }
+
+        //addUserLog('addDevice2', $this->guard()->user()->id, 1);
 
 
 
@@ -2165,9 +2170,17 @@ class PoiController extends Controller
 
 
     public function test(Request $request ){
-        $str = $request->str;
+       /* $str = $request->str;
         $str = substr($str,0,3);
-        return response()->json($str);
+        return response()->json($str);*/
+
+        $device_mac = $request->id2;
+        $device_mac = $device_mac / 65536;
+
+        $device_mac = base_convert($device_mac, 10, 16);
+        //return response()->json($device_mac);
+        $device_mac = sprintf("%012s", $device_mac);
+        return response()->json($device_mac);
 
     }
 }

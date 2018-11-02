@@ -131,6 +131,11 @@ class AlarmController extends Controller
           array_push($sql_where,$sql_part_lvl);
       }
 
+      if($request->has('id')){
+          $sql_part_id = ['devices.id','=',$request->id];
+          array_push($sql_where,$sql_part_id);
+      }
+
       if($request->has('starttime') ||$request->has('endtime') ){
 
           if($request->has('starttime') && $request->has('endtime')){
@@ -173,6 +178,7 @@ class AlarmController extends Controller
                 'pois.location as poi_location'
             )
             ->where($sql_where)
+            ->orderBy('alarmsDevice.time', 'desc')
             ->skip($request->ps * $request->pn)
             ->take($request->ps)
             ->get();
@@ -211,6 +217,11 @@ class AlarmController extends Controller
         if ($request->has('type')) {
             $sql_part_lvl = ['alarmsSensor.type', '=', $request->type];
             array_push($sql_where, $sql_part_lvl);
+        }
+
+        if($request->has('id')){
+            $sql_part_id = ['devices.id','=',$request->id];
+            array_push($sql_where,$sql_part_id);
         }
 
         if ($request->has('starttime') || $request->has('endtime')) {
@@ -261,6 +272,7 @@ class AlarmController extends Controller
                 'sensors.down2'
             )
             ->where($sql_where)
+            ->orderBy('alarmsSensor.time', 'desc')
             ->skip($request->ps * $request->pn)
             ->take($request->ps)
             ->get();
@@ -350,7 +362,8 @@ class AlarmController extends Controller
                 'pois.name as poi_name',
                 'pois.location as poi_location'
             )
-            //->where($sql_where)
+            ->where($sql_where)
+            ->orderBy('alarmsCamera.time', 'desc')
             ->skip($request->ps * $request->pn)
             ->take($request->ps)
             ->get();
@@ -366,6 +379,7 @@ class AlarmController extends Controller
                 'pois.location as poi_location'
             )
             ->where($sql_where)
+            ->orderBy('alarmsCamera.time', 'desc')
             ->count();
         return response()->json(['count' => $count, 'result' => $result]);
 
