@@ -2045,20 +2045,44 @@ class PoiController extends Controller
             $device_test->device_table_id = $request->device_table_id;
         }
 
-        if ($request->has('test_start_time')){
-            $device_test->test_start_time = $request->test_start_time;
+        if ($request->has('gprs_test_start_time')){
+            $device_test->gprs_test_start_time = $request->gprs_test_start_time;
         }
 
-        if ($request->has('test_end_time')){
-            $device_test->test_end_time = $request->test_end_time;
+        if ($request->has('gprs_test_end_time')){
+            $device_test->gprs_test_end_time = $request->gprs_test_end_time;
         }
 
-        if ($request->has('test_result')){
-            $device_test->test_result = $request->test_result;
+        if ($request->has('gprs_test_result')){
+            $device_test->gprs_test_result = $request->gprs_test_result;
+        }
+
+        if ($request->has('gprs_test_status')){
+            $device_test->gprs_test_status = $request->gprs_test_status;
+        }
+
+        if ($request->has('lora_test_start_time')){
+            $device_test->lora_test_start_time = $request->lora_test_start_time;
+        }
+
+        if ($request->has('lora_test_end_time')){
+            $device_test->lora_test_end_time = $request->lora_test_end_time;
+        }
+
+        if ($request->has('lora_test_result')){
+            $device_test->lora_test_result = $request->lora_test_result;
+        }
+
+        if ($request->has('lora_test_status')){
+            $device_test->lora_test_status = $request->lora_test_status;
         }
 
         if ($request->has('online')){
             $device_test->online = $request->online;
+        }
+
+        if ($request->has('remarks')){
+            $device_test->remarks = $request->remarks;
         }
 
         if ($request->has('device_hex_id')){
@@ -2068,11 +2092,6 @@ class PoiController extends Controller
         if ($request->has('device_name')){
             $device_test->device_name = $request->device_name;
         }
-
-        if ($request->has('test_status')){
-            $device_test->test_status = $request->test_status;
-        }
-
 
         $device_test->save();
 
@@ -2108,20 +2127,44 @@ class PoiController extends Controller
             $device_test->device_table_id = $request->device_table_id;
         }
 
-        if ($request->has('test_start_time')){
-            $device_test->test_start_time = $request->test_start_time;
+        if ($request->has('gprs_test_start_time')){
+            $device_test->gprs_test_start_time = $request->gprs_test_start_time;
         }
 
-        if ($request->has('test_end_time')){
-            $device_test->test_end_time = $request->test_end_time;
+        if ($request->has('gprs_test_end_time')){
+            $device_test->gprs_test_end_time = $request->gprs_test_end_time;
         }
 
-        if ($request->has('test_result')){
-            $device_test->test_result = $request->test_result;
+        if ($request->has('gprs_test_result')){
+            $device_test->gprs_test_result = $request->gprs_test_result;
+        }
+
+        if ($request->has('gprs_test_status')){
+            $device_test->gprs_test_status = $request->gprs_test_status;
+        }
+
+        if ($request->has('lora_test_start_time')){
+            $device_test->lora_test_start_time = $request->lora_test_start_time;
+        }
+
+        if ($request->has('lora_test_end_time')){
+            $device_test->lora_test_end_time = $request->lora_test_end_time;
+        }
+
+        if ($request->has('lora_test_result')){
+            $device_test->lora_test_result = $request->lora_test_result;
+        }
+
+        if ($request->has('lora_test_status')){
+            $device_test->lora_test_status = $request->lora_test_status;
         }
 
         if ($request->has('online')){
             $device_test->online = $request->online;
+        }
+
+        if ($request->has('remarks')){
+            $device_test->remarks = $request->remarks;
         }
 
         if ($request->has('device_hex_id')){
@@ -2130,10 +2173,6 @@ class PoiController extends Controller
 
         if ($request->has('device_name')){
             $device_test->device_name = $request->device_name;
-        }
-
-        if ($request->has('test_status')){
-            $device_test->test_status = $request->test_status;
         }
 
 
