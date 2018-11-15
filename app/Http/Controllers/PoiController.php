@@ -545,7 +545,8 @@ class PoiController extends Controller
 
     public function insar(Request $request)
     {
-        //$projectId = $this->guard()->user()->project_id;
+        ini_set('memory_limit','2048M');
+        $projectId = $this->guard()->user()->project_id;
 
         //if($projectId)
         {
@@ -553,21 +554,34 @@ class PoiController extends Controller
             //return response()->json($insars);
         }
         if ($this->guard()->user()->type == 3) {
-            $colors = DB::table('insar')->select('color')->where('mean_velocity','<',-20)->distinct()->get();
+            $colors = DB::table('insar')
+                ->select('color')
+                ->where([['mean_velocity','<',-20],['project_id','=',$projectId]])
+                ->distinct()
+                ->get();
 
             foreach ($colors as $color) {
-                $insars = DB::table('insar')->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g', 'mean_velocity')->where([['color', $color->color],['mean_velocity','<',-20]])->get();
+                $insars = DB::table('insar')->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g', 'mean_velocity')
+                    ->where([['color', $color->color],['mean_velocity','<',-20],['project_id','=',$projectId]])
+                    ->get();
                 $color->insars = $insars;
 
             }
 
-
+        ini_set('memory_limit','1024M');
             return response()->json($colors);
         }else{
-            $colors = DB::table('insar')->select('color')->distinct()->get();
+            $colors = DB::table('insar')
+                ->select('color')
+                ->where('project_id','=',$projectId)
+                ->distinct()
+                ->get();
 
             foreach ($colors as $color) {
-                $insars = DB::table('insar')->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g')->where('color', $color->color)->get();
+                $insars = DB::table('insar')
+                    ->select('id', 'latitude', 'longitude', 'lng_g', 'lat_g')
+                    ->where([['color','=', $color->color],['project_id','=',$projectId]])
+                    ->get();
                 $color->insars = $insars;
 
             }
@@ -1143,7 +1157,7 @@ class PoiController extends Controller
                 break;
             case '0005':
                 DB::table('crack_device_info')
-                    ->insert(['device_hex_id' => $device_mac]);
+                    ->insert(['device_hex_id' => $device_mac,'stand' => 0]);
                 break;
         }
 
