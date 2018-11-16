@@ -1007,7 +1007,7 @@ class PoiController extends Controller
             'name' => 'required',
             'location' => 'required',
             'project_id' => 'required',
-            'id2' => 'required|numeric|unique:pois,id2,,,deleted_at,NULL',
+            //'id2' => 'required|numeric|unique:pois,id2,,,deleted_at,NULL',
         ]);
 
         $poi = new Poi;
@@ -1015,7 +1015,7 @@ class PoiController extends Controller
         $poi->project_id = $request->project_id;
         $poi->name = $request->name;
         $poi->location = $request->location;
-        $poi->id2 = $request->id2;
+        //$poi->id2 = $request->id2;
 
         if ($request->has('user_id'))
             $poi->user_id = $request->input('user_id');
@@ -1039,8 +1039,8 @@ class PoiController extends Controller
         ]);
 
         $poi = Poi::findOrFail(intval($request->id));
-        if ($request->has('id2'))
-            $poi->id2 = $request->input('id2');
+        /*if ($request->has('id2'))
+            $poi->id2 = $request->input('id2');*/
         if ($request->has('name'))
             $poi->name = $request->input('name');
         if ($request->has('user_id'))
