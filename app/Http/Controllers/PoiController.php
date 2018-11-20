@@ -385,7 +385,7 @@ class PoiController extends Controller
                 return response()->json(['error' => '未经授权的操作'], 401);
         }
 
-        $devices = Device::where([['poi_id', $request->id], ['type', '<>', 6]])->get();
+        $devices = Device::where('poi_id', $request->id)->get();
         //$devices  =Device::all();
         //$count = Device::where([['poi_id', $request->id],['type','<>',6]])->count();
         //$returns =['devices' =>$devices];
