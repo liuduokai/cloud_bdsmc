@@ -2221,20 +2221,1556 @@ class PoiController extends Controller
         return response()->json(['message'=>'添加成功']);
     }
 
+    public function getSomeThingByProjectId(Request $request){
+        $this->validate($request, [
+            'projectId' => 'required',
+        ]);
 
-    public function test(Request $request ){
-       /* $str = $request->str;
-        $str = substr($str,0,3);
-        return response()->json($str);*/
+        $project_id = $request->projectId;
+        if($request->has('online') && $request->has('recentUpdate')){
+            if($request->recentUpdate === 0){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?
+	and dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id,$request->online]);
+            }
+            if($request->recentUpdate === 1){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id,$request->online]);
+            }
+            if($request->recentUpdate === 2){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) < 2;', [$project_id,$project_id,$project_id,$request->online]);
+            }
+        }else if($request->has('online')){
+            $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?;', [$project_id,$project_id,$project_id,$request->online]);
+        }else if($request->has('recentUpdate')){
+            if($request->recentUpdate === 0){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	and dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id]);
+            }
+            if($request->recentUpdate === 1){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id]);
+            }
+            if($request->recentUpdate === 2){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) < 2;', [$project_id,$project_id,$project_id]);
+            }
+        }else{
+            $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	1=1;', [$project_id,$project_id,$project_id]);
+        }
+        return response()->json($result);
+    }
 
-        $device_mac = $request->id2;
-        $device_mac = $device_mac / 65536;
+    public function getOtherThingsByProjectId(Request $request){
+        $this->validate($request, [
+            'projectId' => 'required',
+        ]);
+        $result = DB::select('select 
+	sensors.device_id as deviceId,
+    alarmsSensor.time,
+    alarmsSensor.content
+from 
+	sensors
+    left join alarmsSensor on sensors.id = alarmsSensor.sensor_id
+    right join 
+	(
+		select 
+			max(D.id) recentAlarmId
+		from 
+			pois A
+			left join devices B on A.id = B.poi_id
+			left join sensors C on B.id = C.device_id
+			left join alarmsSensor D on C.id = D.sensor_id
+		where 
+			A.project_id = ?
+			and A.deleted_at is NULL
+			and D.sensor_id is not NULL
+			and hour(timediff(now(),D.time)) <=24
+		group by C.id
+	) recentAlarm
+    on alarmsSensor.id = recentAlarm.recentAlarmId',[$request->projectId]);
+        return response()->json($result);
+    }
 
-        $device_mac = base_convert($device_mac, 10, 16);
-        //return response()->json($device_mac);
-        $device_mac = sprintf("%012s", $device_mac);
-        return response()->json($device_mac);
+    public function getSomeThingByDeviceId(Request $request){
+        $this->validate($request, [
+            'deviceId' => 'required',
+        ]);
+        $result = DB::select('select 
+	A.id pojectId, A.name projectName, 
+    B.id poiId, B.name poiName, B.location,
+    C.id deviceId, C.name deviceName, C.mac, C.online
+from
+	projects A 
+    left join pois B on A.id = B.project_id
+    left join devices C on B.id = C.poi_id
+where
+	C.id = ?
+    and A.deleted_at is NULL
+    and B.deleted_at is NULL
+    and C.deleted_at is NULL',
+    [$request->deviceId]);
+        return response()->json($result);
+    }
 
+    public function getOtherThingsByDeviceId(Request $request){
+        $this->validate($request, [
+            'deviceId' => 'required',
+        ]);
+        $result = DB::select('select 
+	A.id as deviceId, A.mac as deviceMac, A.name as deviceName
+    , B.id as sensorId, B.name as sensorName
+    , C.id as dataId, C.gps_time, C.displacement as data
+from 
+	devices A
+    left join sensors B on A.id = B.device_id
+    left join displacementsensor1 C on B.id = C.device_id
+where 
+	A.id = ?
+    and A.deleted_at is NULL
+    and B.deleted_at is NULL
+order by A.id, B.id, C.id desc',
+            [$request->deviceId]);
+        return response()->json($result);
+    }
+
+
+    public function test(Request $request )
+    {
+        /* $str = $request->str;
+         $str = substr($str,0,3);
+         return response()->json($str);*/
+
+        /* $device_mac = $request->id2;
+         $device_mac = $device_mac / 65536;
+
+         $device_mac = base_convert($device_mac, 10, 16);
+         //return response()->json($device_mac);
+         $device_mac = sprintf("%012s", $device_mac);
+         return response()->json($device_mac);*/
+
+        $this->validate($request, [
+            'projectId' => 'required',
+        ]);
+
+        $project_id = $request->projectId;
+        if($request->has('online') && $request->has('recentUpdate')){
+           if($request->recentUpdate === 0){
+               $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?
+	and dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id,$request->online]);
+           }
+           if($request->recentUpdate === 1){
+               $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id,$request->online]);
+           }
+           if($request->recentUpdate === 2){
+               $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) < 2;', [$project_id,$project_id,$project_id,$request->online]);
+           }
+        }else if($request->has('online')){
+            $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	baseInf.online = ?;', [$project_id,$project_id,$project_id,$request->online]);
+        }else if($request->has('recentUpdate')){
+            if($request->recentUpdate === 0){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	and dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id]);
+            }
+            if($request->recentUpdate === 1){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id]);
+            }
+            if($request->recentUpdate === 2){
+                $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) < 2;', [$project_id,$project_id,$project_id]);
+            }
+        }else{
+            $result = DB::select('select 
+	baseInf.projectId, baseInf.projectName, baseInf.poiId
+	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
+	, baseInf.device_type, baseInf.deviceTypeName, baseInf.deviceNum
+	, baseInf.mac, baseInf.deviceId, baseInf.online
+    ,dataInf.maxId, dataInf.gps_time 
+	,dataInf.sensorId ,dataInf.data
+from 
+	(
+		select 
+			SummaryPoi.projectId, SummaryPoi.projectName, SummaryPoi.poiId, SummaryPoi.poiName, SummaryPoi.poiLocation
+			, SummaryPoi.device_type, SummaryPoi.deviceTypeName, SummaryPoi.deviceNum
+			, SummaryDev.deviceId, SummaryDev.mac, SummaryDev.online
+		from
+			(
+				select 
+					A.id as projectId, A.name as projectName, B.id as poiId, B.name as poiName, B.location as poiLocation,
+					replace(Left(C.mac,4),\'0\',\'\') as device_type,
+					(case replace(Left(C.mac,4),\'0\',\'\') 
+						when 1 then \'天线\'
+						when 2 then \'其他\'
+						when 3 then \'GNSS\'
+						when 4 then \'雨量\'
+						when 5 then \'裂缝\'
+						when 6 then \'土壤含水\'
+					else \'其他\' end) as deviceTypeName,
+					count(*) as deviceNum
+				from 
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by projectId, projectName, poiId, poiName,  
+					device_type,  deviceTypeName
+			) SummaryPoi
+			left join 
+			(
+				select 
+					B.id as poiId, C.id as deviceId, 
+					replace(Left(C.mac,4),\'0\',\'\') as device_type, 
+					C.mac, C.online
+				from
+					projects A 
+					left join pois B on A.id = B.project_id
+					left join devices C on B.id = C.poi_id
+				where 
+					A.deleted_at is NULL
+					#暂不统计兰州项目（锚索计）
+					and A.id = ?
+					and B.id is not NULL
+					and B.deleted_at is NULL 
+					and C.id is not null
+					and C.deleted_at is NULL
+				group by A.id, B.id, C.id
+			) SummaryDev
+			on SummaryPoi.poiId = SummaryDev.poiId and SummaryPoi.device_type = SummaryDev.device_type
+    ) baseInf
+    left join
+    (
+		select 
+			maxId.deviceId, maxId.maxId, displacementsensor1.gps_time, 
+			displacementsensor1.device_id as sensorId, 
+			displacementsensor1.displacement as data
+		from 
+			(
+				select 
+					A.id deviceId, max(C.id) maxId 
+				from 
+					projects 
+					left join pois on projects.id = pois.project_id
+					left join devices A on pois.id = A.poi_id
+					left join sensors B on A.id = B.device_id
+					left join displacementsensor1 C on B.id = C.device_id
+				where projects.id = ?
+				group by A.id  
+			) maxId
+			left join displacementsensor1 on maxId.maxId = displacementsensor1.id
+		where 
+			maxId.maxId is not NULL
+    ) dataInf on baseInf.deviceId = dataInf.deviceId
+where 
+	1=1;', [$project_id,$project_id,$project_id]);
+        }
+        return response()->json($result);
     }
 }
-

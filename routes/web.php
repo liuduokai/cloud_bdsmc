@@ -383,3 +383,20 @@ $router->options('/getDeviceTest', ['middleware' => 'cors','uses' => 'PoiControl
 $router->post('/addMoreDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeviceTest']);
 $router->get('/addMoreDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeviceTest']);
 $router->options('/addMoreDeviceTest', ['middleware' => 'cors','uses' => 'PoiController@addMoreDeviceTest']);
+
+
+$router->post('/getSomeThingByProjectId', ['middleware' => 'cors','uses' => 'PoiController@getSomeThingByProjectId']);
+$router->get('/getSomeThingByProjectId', ['middleware' => 'cors','uses' => 'PoiController@getSomeThingByProjectId']);
+$router->options('/getSomeThingByProjectId', ['middleware' => 'cors','uses' => 'PoiController@getSomeThingByProjectId']);
+
+$router->post('/getOtherThingsByProjectId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByProjectId']);
+$router->get('/getOtherThingsByProjectId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByProjectId']);
+$router->options('/getOtherThingsByProjectId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByProjectId']);
+
+$router->post('/getSomeThingByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getSomeThingByDeviceId']);
+$router->get('/getSomeThingByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getSomeThingByDeviceId']);
+$router->options('/getSomeThingByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getSomeThingByDeviceId']);
+
+$router->post('/getOtherThingsByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByDeviceId']);
+$router->get('/getOtherThingsByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByDeviceId']);
+$router->options('/getOtherThingsByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByDeviceId']);
