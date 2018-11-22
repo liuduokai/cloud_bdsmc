@@ -508,8 +508,7 @@ class PoiController extends Controller
                 foreach ($records as $record) {
 
                     array_push($res, $record);
-                    $sheet->setCellValue('A' . $row,
-                        $record->displacement);
+                    $sheet->setCellValue('A' . $row, $record->displacement);
                     $sheet->setCellValue('B' . $row, $record->gps_time);
                     $row = $row + 1;
                 }
