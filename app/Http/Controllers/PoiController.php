@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use function MongoDB\BSON\fromJSON;
+use phpDocumentor\Reflection\Project;
 use phpDocumentor\Reflection\Types\Null_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -3169,29 +3170,43 @@ limit  ?,? ',
         return response()->json(['sensorsArray' =>$sensorsArray, 'data' => $result_final_full]);
     }
 
-    public function searchPoiReturnCorrectDevice(Request $request, $q)
+    public function searchPoiReturnCorrectDevice(Request $request)
     {
-        $pinyin = new Pinyin();
+        $keyWord = $request->keyWord;
 
-        $sId = $q;
-
-        $devices = Device::search($sId)
-            ->where('devices.deleted_at', '=', NULL)
-            ->get();
-        foreach ($devices as $device) {
-            if ($device->poi != null)
-                $poiss[$device->poi->id] = $device->poi;
+        if($request->has('projectId')){
+            $pois = Poi::search(urldecode($keyWord))
+                ->where([['pois.project_id','=',$request->projectId],['pois.deleted_at', '=', NULL]])
+                ->get();
+            return response()->json($pois);
+        }elseif($request->has('poiId')){
+            $devices =  $devices = Device::search($keyWord)
+                ->where([['devices.deleted_at', '=', NULL],['devices.poi_id', '=',$request->poiId]])
+                ->get();
+            return response()->json($devices);
+        }else{
+            return response()->json("参数错误");
         }
 
-        if(isset($poiss)) {
-            foreach ($poiss as $poi) {
+        /*if($request->has(poiId)) {
+            $devices = Device::search($keyWord)
+                ->where('devices.deleted_at', '=', NULL)
+                ->get();
+            foreach ($devices as $device) {
+                if ($device->poi != null)
+                    $poiss[$device->poi->id] = $device->poi;
+            }
+
+            if (isset($poiss)) {
+                foreach ($poiss as $poi) {
 
                     $poi_name = $poi->name;
                     $poi["pinyin"] = $pinyin->convert($poi_name)[0][0];
-                    $poi["devices"]  = Device::search($sId)
-                        ->where([['devices.deleted_at', '=', NULL],['devices.poi_id','=',$poi->id]])
+                    $poi["devices"] = Device::search($keyWord)
+                        ->where([['devices.deleted_at', '=', NULL], ['devices.poi_id', '=', $poi->id]])
                         ->get();
                     $pois_id[] = $poi;
+                }
             }
         }
         $pois_name = Poi::search(urldecode($q))
@@ -3206,7 +3221,7 @@ limit  ?,? ',
             $pois = $pois_id;
         else
             $pois = $pois_name;
-        return response()->json($pois);
+        return response()->json($pois);*/
     }
 
 
