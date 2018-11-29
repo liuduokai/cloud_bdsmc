@@ -3169,10 +3169,10 @@ limit  ?,? ',
         return response()->json(['sensorsArray' =>$sensorsArray, 'data' => $result_final_full]);
     }
 
-    public function searchPoiWithCorrectDevice(Request $request, $q)
+    public function searchPoiReturnCorrectDevice(Request $request, $q)
     {
         $pinyin = new Pinyin();
-        $project_id = $this->guard()->user()->project_id;
+
         $sId = $q;
 
         $devices = Device::search($sId)
@@ -3182,57 +3182,24 @@ limit  ?,? ',
             if ($device->poi != null)
                 $poiss[$device->poi->id] = $device->poi;
         }
-        $count = 1;
+
         if(isset($poiss)) {
             foreach ($poiss as $poi) {
-                //return response()->json(['type'=>gettype($poi),'project_id'=>$poi->project_id,'poi_name'=>$poi->name]);
-                if ($poi->project_id === $project_id || $this->guard()->user()->type === 1) { //权限控制，测试版本暂时不加入相应功能
-                    $poi_name = $poi->name;
 
+                    $poi_name = $poi->name;
                     $poi["pinyin"] = $pinyin->convert($poi_name)[0][0];
-                    $photos = $poi->photos;
-                    foreach ($photos as $photo) {
-                        $photo["devices"] = $photo->photopostions;
-                    }
-                    $poi["photos"] = $photos;
-                    $poi["devices2"] = $poi->devices;
+                    $poi["devices"]  = Device::search($sId)
+                        ->where([['devices.deleted_at', '=', NULL],['devices.poi_id','=',$poi->id]])
+                        ->get();
                     $pois_id[] = $poi;
-                    //$count++;
-                }
             }
         }
-
-        //根据监测点名搜索
-        if ($this->guard()->user()->type == 1)
-            //$pois = Poi::where('project_id', $this->guard()->user()->project_id)->get();
-
-            $pois_name = Poi::search(urldecode($q))
-                //->where
-                ->get();
-        else {
-            $pois_name = Poi::search(urldecode($q))
-                ->where('project_id',$project_id)
-                ->get();
-        }
-
+        $pois_name = Poi::search(urldecode($q))
+            ->get();
 
         foreach ($pois_name as $poi) {
             $poi["pinyin"] = $pinyin->convert($poi->name)[0][0];
-
-
-            $photos = $poi->photos;
-            foreach ($photos as $photo) {
-                $photo["devices"] = $photo->photopostions;
-            }
-
-            $poi["photos"] = $photos;
-            $poi["devices2"] = $poi->devices;
-
-            //$poi["photos"] = Photo::where('poi_id',$poi->id)->get();
-            //$poi["photos"] = \App\Photo::all();
-            //$queries    = DB::getQueryLog();
-            //$last_query = end($queries);
-            //dd($last_query);
+            $poi["devices"] = $poi->devices;
         }
 
         if (isset($pois_id))
