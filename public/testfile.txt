@@ -1,0 +1,13 @@
+POST /test?a=1&b=2 HTTP/1.1
+Accept:          */*
+Accept-Encoding: gzip, deflate
+Cache-Control:   no-cache
+Connection:      keep-alive
+Content-Length:  258
+Content-Type:    multipart/form-data; boundary=--------------------------939750650072193224192345
+Cookie:          PHPSESSID=pg4n8dk5nrjrmmb7jd5nvr51p6
+Host:            localhost
+Postman-Token:   3d6ca56a-6007-4a9b-a5bf-aec3e0fe3460
+User-Agent:      PostmanRuntime/7.3.0
+Cookie: PHPSESSID=pg4n8dk5nrjrmmb7jd5nvr51p6
+

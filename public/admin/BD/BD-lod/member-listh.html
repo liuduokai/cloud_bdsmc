@@ -1,0 +1,378 @@
+﻿<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <link rel="stylesheet" href="../src/css/layui.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+     
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-nav">
+      <!--<span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a href="">项目名称</a>
+        <a>
+          <cite>汇聚端ID</cite></a>
+      </span>-->
+      <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+    </div>
+    <div class="x-body">
+     <!-- <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+          <input class="layui-input" placeholder="开始日" name="start" id="start">
+          <input class="layui-input" placeholder="截止日" name="end" id="end">
+          <input type="text" name="username"  placeholder="请输入用户名" autocomplete="off" class="layui-input">
+          <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+        </form>
+      </div>-->
+      <xblock>
+        <button class="layui-btn layui-btn-danger" onclick="delAll()"><i class="layui-icon"></i>批量删除</button>
+        <button class="layui-btn" onclick="addpoi()"><i class="layui-icon"></i>添加汇聚端</button>
+          <div class="layui-inline">
+              <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+          </div>
+        <button class="layui-btn" onclick="x_admin_show('查找汇聚端', './member-selcet.html', 600, 400)"><i class="layui-icon"></i>搜索</button>
+        <!--<span id="numUser" class="x-right" style="line-height:40px">共有数据：xx 条</span>-->
+      </xblock>
+        <table id="demo" lay-filter="mybar"></table>
+        <script type="text/html" id="barDemo">
+            <a class="layui-btn layui-btn-mini" lay-event="detail">查看</a>
+            <a class="layui-btn layui-btn-mini" lay-event="edit">编辑</a>
+            <a class="layui-btn layui-btn-danger layui-btn-mini" lay-event="del">删除</a>
+        </script>
+        <div id="test1"></div>
+        
+       
+
+    </div>
+      <script src="../src/layui.js" charset="utf-8"></script>
+    <script>
+      layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        var table = layui.table;
+        //执行一个laydate实例
+        
+
+        laydate.render({
+            elem: '#start' //指定元素
+        });
+
+          //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+        });
+      });
+
+       /*用户-停用*/
+      function member_stop(obj,id){
+          layer.confirm('确认要停用吗？',function(index){
+
+              if($(obj).attr('title')=='启用'){
+
+                //发异步把用户状态进行更改
+                $(obj).attr('title','停用')
+                $(obj).find('i').html('&#xe62f;');
+
+                $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('已停用');
+                layer.msg('已停用!',{icon: 5,time:1000});
+
+              }else{
+                $(obj).attr('title','启用')
+                $(obj).find('i').html('&#xe601;');
+
+                $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已启用');
+                layer.msg('已启用!',{icon: 5,time:1000});
+              }
+              
+          });
+      }
+
+      /*用户-删除*/
+      function member_del(obj,id){
+          layer.confirm('确认要删除吗？',function(index){
+             // alert("sss");
+              //发异步删除数据
+              $(obj).parents("tr").remove();
+              layer.msg('已删除!',{icon:1,time:1000});
+          });
+      }
+
+
+
+      function delAll (argument) {
+
+        var data = tableCheck.getData();
+  
+        layer.confirm('确认要删除吗？'+data,function(index){
+            //捉到所有被选中的，发异步进行删除
+            layer.msg('删除成功', {icon: 1});
+            $(".layui-form-checked").not('.header').parents('tr').remove();
+        });
+      }
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+      <script>
+          var id;
+         
+          window.onload = function () {
+              var tdata;
+              function GetQueryString(name) {
+                  var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                  var r = window.location.search.substr(1).match(reg);
+                  if (r != null) return unescape(r[2]); return null;
+              }
+              id = unescape(GetQueryString("id"));
+             
+              if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                  xmlhttp = new XMLHttpRequest();
+              }
+              else {// code for IE6, IE5
+                  xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+              }
+
+              xmlhttp.onreadystatechange = function () {
+
+                  if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                      var json_m = xmlhttp.responseText;
+
+                      tdata = eval('(' + json_m + ')');
+
+                      layui.use('laydate', function () {
+                          var laydate = layui.laydate;
+                          var table = layui.table;
+                          //执行一个laydate实例
+
+
+                          laydate.render({
+                              elem: '#start' //指定元素
+                          });
+
+                          //执行一个laydate实例
+                          laydate.render({
+                              elem: '#end' //指定元素
+                          });
+                      });
+
+                      layui.use('table', function () {
+                          var table = layui.table;
+
+                          //渲染
+
+
+                          table.on('checkbox(useruv)', function (obj) {
+                              console.log(obj)
+                          });
+
+                          table.render({
+                              elem: '#demo'
+                              //,width: 900
+                              //,height: 274
+                            , cols: [[ //标题栏
+                              { type: 'checkbox', LAY_CHECKED: false }
+
+                              , { field: 'id', title: 'id', width: 80 }
+                              , { field: 'id2', title: '汇聚Mac', width: 80 }
+                              , { field: 'user_id', title: '用户ID', width: 80 }
+                              , { field: 'project_id', title: '项目ID', width: 120 }
+                              , { field: 'lng', title: '经度', width: 150 }
+                              , { field: 'lat', title: '纬度', width: 150 }
+                              , { field: 'altitude', title: '高度', width: 80 }
+                              , { field: 'name', title: '名称', width: 80 }
+                             
+                              , { field: 'location', title: '位置', width: 100 }
+                            // , { field: 'props', title: 'props', width: 100 }
+                               , { fixed: 'right', title: '操作', width: 250, align: 'center', toolbar: '#barDemo' }
+                            ]]
+                              // , url: 'http://192.168.1.160:8000/admin'//'myuser.json'
+                           
+                              , data: tdata
+                             , method: 'GET'
+                            , id: 'testReload'
+                            , skin: 'row' //表格风格
+                            , even: true
+                              //,size: 'lg' //尺寸
+
+                            , page: true //是否显示分页
+                            , limits: [10, 20, 30, 40, 50]
+                            , limit: 10 //每页默认显示的数量
+                              //,loading: false //请求数据时，是否显示loading
+                          });
+
+                          var $ = layui.$, active = {
+                              reload: function () {
+                                  var demoReload = $('#demoReload');
+                                 // alert(demoReload);
+                                  table.reload('testReload', {
+                                      page: {
+                                          curr: 1 //重新从第 1 页开始
+                                      }
+                                     , where: {
+                                         key: {
+                                             id: demoReload.val()
+                                         }
+
+                                     }
+                                  });
+                              }
+                          };
+
+                          $('.demoTable .layui-btn').on('click', function () {
+                              var type = $(this).data('type');
+                              active[type] ? active[type].call(this) : '';
+                          });
+                          table.on('checkbox(useruv)', function (obj) {
+                              console.log(obj)
+                          });
+                          table.on('tool(mybar)', function (obj) {
+                              var data = obj.data;
+                              if (obj.event === 'detail') {
+                               //   alert(data.id);
+                                  x_admin_show('包含采集端', './member-listpc.html?id=' + data.id, 1580, 800);
+
+                              } else if (obj.event === 'del') {
+                                  layer.confirm('真的删除行么', function (index) {
+                                      console.log(data);
+                                      $.ajax({
+                                          url: "http://192.168.1.160:8000/delPoi2",
+                                          type: "GET",
+                                          data: { "id": data.id },
+                                          dataType: "json",
+                                          success: function (data) {
+
+                                              if (data.message == "del_ok") {
+
+                                                  //删除这一行
+                                                  obj.del();
+                                                  //关闭弹框
+                                                  layer.close(index);
+                                                  layer.msg("删除成功", { icon: 6 });
+                                              } else {
+                                                  layer.msg("删除失败", { icon: 5 });
+                                              }
+                                          }
+
+                                      });
+                                  });
+                              } else if (obj.event === 'edit') {
+                                  x_admin_show('修改汇聚端', './poiupdate.html?id=' + escape(data.id) + '&user_id=' + escape(data.user_id) + '&lng=' + escape(data.lng) + '&lat=' + escape(data.lat) + '&name=' + escape(data.name) + '&location=' + escape(data.location) + '&altitude=' + escape(data.altitude) + '&id2=' + escape(data.id2), 400, 600);
+
+                              }
+                          });
+
+                      });
+
+                      function EidtUv(data, value, index, obj) {
+                          $.ajax({
+                              url: "UVServlet",
+                              type: "POST",
+                              data: { "uvid": data.id, "memthodname": "edituv", "aid": data.aid, "uv": value },
+                              dataType: "json",
+                              success: function (data) {
+
+                                  if (data.state == 1) {
+                                      //关闭弹框
+                                      layer.close(index);
+                                      //同步更新表格和缓存对应的值
+                                      obj.update({
+                                          uv: value
+                                      });
+                                      layer.msg("修改成功", { icon: 6 });
+                                  } else {
+                                      layer.msg("修改失败", { icon: 5 });
+                                  }
+                              }
+
+                          });
+                      }
+                      
+
+                  }
+              }
+              xmlhttp.open("GET", "http://192.168.1.160:8000/listPois2?id=" + id, false);
+              xmlhttp.send();
+          }
+         
+          function addpoi() {
+            
+              x_admin_show('添加汇聚端', './member-addh.html?id=' + id, 500, 650);
+
+          }
+          function EidtUv(data, value, index, obj) {
+              $.ajax({
+                  url: "UVServlet",
+                  type: "POST",
+                  data: { "uvid": data.id, "memthodname": "edituv", "aid": data.aid, "uv": value },
+                  dataType: "json",
+                  success: function (data) {
+
+                      if (data.state == 1) {
+                          //关闭弹框
+                          layer.close(index);
+                          //同步更新表格和缓存对应的值
+                          obj.update({
+                              uv: value
+                          });
+                          layer.msg("修改成功", { icon: 6 });
+                      } else {
+                          layer.msg("修改失败", { icon: 5 });
+                      }
+                  }
+
+              });
+          }
+          //监听工具条
+          //监听工具条
+          
+		  
+		  var $ = layui.$, active = {
+    getCheckData: function(){ //获取选中数据
+      var checkStatus = table.checkStatus('idTest')
+      ,data = checkStatus.data;
+      layer.alert(JSON.stringify(data));
+    }
+    ,getCheckLength: function(){ //获取选中数目
+      var checkStatus = table.checkStatus('idTest')
+      ,data = checkStatus.data;
+      layer.msg('选中了：'+ data.length + ' 个');
+    }
+    ,isAll: function(){ //验证是否全选
+      var checkStatus = table.checkStatus('idTest');
+      layer.msg(checkStatus.isAll ? '全选': '未全选')
+    }
+  };
+  
+  $('.demoTable .layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+  });
+
+      </script>
+      
+
+     
+      
+  </body>
+
+</html>

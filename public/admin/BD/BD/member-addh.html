@@ -1,0 +1,261 @@
+﻿<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-body">
+        <form class="layui-form">
+         <!-- <div class="layui-form-item">
+              <label for="L_email" class="layui-form-label">
+                  <span class="x-red">*</span>集中器ID
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="poi_id" name="poi_id" required="" lay-verify="nikeproname"
+                  autocomplete="off" class="layui-input">
+              </div>
+              <div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>
+              </div>
+          </div>-->
+            <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">
+                    <span class="x-red">*</span>用户ID
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="user_id" name="user_id" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">
+                    <span class="x-red">*</span>汇聚端Mac
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="id2" name="id2" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">
+                    <span class="x-red">*</span>位置信息
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="location" name="location" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_email" class="layui-form-label">
+                    <span class="x-red">*</span>名称
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="name" name="name" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+                <div class="layui-form-mid layui-word-aux">
+                    <span class="x-red">*</span>
+                </div>
+            </div>
+          
+          <div class="layui-form-item">
+              <label for="L_username" class="layui-form-label">
+                  <span class="x-red">*</span>经度
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="lng" name="lng" required="" lay-verify="nikename"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+            <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">
+                    <span class="x-red">*</span>纬度
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="lat" name="lat" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">
+                    <span class="x-red">*</span>高度
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="altitude" name="altitude" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+                  <span class="x-red">*</span>类型
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="type" name="type" required="" lay-verify="nikeproname"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>
+            
+            <!--<div class="layui-form-item">
+                <label for="L_repass" class="layui-form-label">
+                    <span class="x-red">*</span>dimension
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="dimension" name="dimension" required="" lay-verify="nikeproname"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>-->
+            
+          <div class="layui-form-item">
+              <label for="L_repass" class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" lay-submit="" onclick="adminpro()">
+                  增加
+              </button>
+          </div>
+      </form>
+    </div>
+    <script>
+        var id;
+        window.onload = function () {
+            function GetQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            }
+            id = unescape(GetQueryString("id"));
+          //  alert(id);
+            
+        }
+        function adminpro() {
+            
+           // var poi_id = document.getElementById("poi_id").value;
+            var lng = document.getElementById("lng").value;
+            var lat = document.getElementById("lat").value;
+            var type = document.getElementById("type").value;
+            var name = document.getElementById("name").value;
+            var altitude = document.getElementById("altitude").value;
+            var location = document.getElementById("location").value;
+            var user_id = document.getElementById("user_id").value;
+            var id2 = parseInt(document.getElementById("id2").value,16);
+            if (lng.length>11)
+            {
+                x_admin_close();
+                alert("经度字段小于11字节");
+                return false;
+            }
+          
+            if (lat.length > 11) {
+                x_admin_close();
+                alert("纬度字段小于11字节");
+                return false;
+            }
+            if (type.length > 6) {
+                x_admin_close();
+                alert("类型字段小于11字节");
+                return false;
+            }
+            if (location.length > 11) {
+                x_admin_close();
+                alert("位置信息字段小于15字节");
+                return false;
+            }
+            if (name.length > 11) {
+                x_admin_close();
+                alert("名称字段小于10字节");
+                return false;
+            }
+            if (altitude.length > 11) {
+                alert("高度字段小于8字节");
+                return false;
+            }
+            if (user_id.length > 11) {
+                x_admin_close();
+                alert("用户字段小于8字节");
+                return false;
+            }
+            if (id2.length > 20) {
+                x_admin_close();
+                alert("传感器设备ID字段小于20字节");
+                return false;
+            }
+
+           // var dimension = document.getElementById("dimension").value;
+           
+            var xmlhttp;
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+
+            }
+            else {// code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+
+            }
+
+            xmlhttp.onreadystatechange = function () {
+               
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data;
+
+                    var json_m = xmlhttp.responseText;
+
+                    data = eval('(' + json_m + ')');
+                    //alert(data.message);
+                    if (data.message == "add_ok") {
+                        //alert("close");
+                        //self.opener = null;
+                        //self.close();
+                        //关闭当前页面
+                        layer.msg("添加成功", { icon: 6 });
+                        x_admin_close();
+                        
+                        layer.close(index);
+
+                    }
+
+                }
+            }
+            var url = "/addPoi2?project_id=" + id + "&lng=" + lng + "&lat=" + lat + "&type=" + type + "&name=" + name + "&location=" + location + "&altitude=" + altitude + "&user_id=" + user_id + "&id2=" + id2;
+            xmlhttp.open("GET", url, false);
+          
+            xmlhttp.send();
+           
+        }
+
+    </script>
+      <script>
+
+
+
+      </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>

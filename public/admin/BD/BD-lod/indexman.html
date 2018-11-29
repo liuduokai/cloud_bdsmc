@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>北斗后台管理系统</title>
+    <link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/font-awesome/4.6.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./build/css/app.css" media="all">
+	 <script type="text/javascript" src="js/kitlib.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+</head>
+
+<body>
+    <div class="layui-layout layui-layout-admin kit-layout-admin">
+        <div class="layui-header">
+            <div class="layui-logo">北斗微芯后台管理系统</div>
+            <div class="layui-logo kit-logo-mobile">K</div>
+            <ul class="layui-nav layui-layout-left kit-nav" kit-one-level>
+                <!--<li class="layui-nav-item"><a href="javascript:;">控制台</a></li>
+                <li class="layui-nav-item"><a href="javascript:;">商品管理</a></li>-->
+            </ul>
+            <ul class="layui-nav layui-layout-right kit-nav">
+                <!--<li class="layui-nav-item"><a href="javascript:;" id="pay"><i class="fa fa-gratipay" aria-hidden="true"></i> 捐赠我</a></li>-->
+                <li class="layui-nav-item">
+                    <a href="javascript:;">
+                        <img src="ht.png" class="layui-nav-img"> 项目
+                    </a>
+                    <dl class="layui-nav-child">
+					<xblock>
+                        <!--<dd><a href="member-addpro.html">增加项目</a></dd>
+                        <dd><a href="javascript:;">安全设置</a></dd>-->
+						<dd><a href="javascript:;"><button class="layui-btn" onclick="x_admin_show('操作项目','./member-addpro.html',1600,800)"><i class="layui-icon"></i>操作</button></a></dd>
+                        <!--<dd><a href="javascript:;"><button class="layui-btn" onclick="x_admin_show('添加用户','./member-addpro.html',500,600)"><i class="layui-icon"></i>添加</button></a></dd>-->
+					</xblock>
+                    </dl>
+                </li>
+               <!-- <li class="layui-nav-item"><a href="javascript:;"><i class="fa fa-sign-out" aria-hidden="true"></i> 注销</a></li>-->
+            </ul>
+        </div>
+
+        <div class="layui-side layui-bg-black kit-side">
+            <div class="layui-side-scroll">
+                <div class="kit-side-fold"><i class="fa fa-navicon" aria-hidden="true"></i></div>
+                <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                <ul  id="myid" class="layui-nav layui-nav-tree" lay-filter="kitNavbar" kit-navbar>
+                    <li class="layui-nav-item" >
+                        <a class="" href="javascript:;"><i class="fa fa-plug" aria-hidden="true"></i><span> 项目名称</span></a>
+                        <dl class="layui-nav-child">
+                            <dd>
+                                <a href="javascript:;" kit-target data-options="{url:'member-list2222.html',icon:'&#xe6c6;',title:'用户管理',id:'1'}">
+                                    <i class="layui-icon">&#xe6c6;</i><span> 用户管理系统</span></a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:;" kit-target data-options="{url:'member-listpc.html',icon:'&#xe6c6;',title:'设备详情',id:'2'}">
+                                    <i class="layui-icon">&#xe6c6;</i><span> 传感器</span>
+                                </a>
+                            </dd>
+                            
+                        </dl>
+                    </li>
+                  
+                    
+                </ul>
+            </div>
+        </div>
+        <div class="layui-body" id="container">
+            <!-- 内容主体区域 -->
+            <div style="padding: 15px;">主体内容加载中,请稍等...</div>
+        </div>
+
+        <div class="layui-footer">
+            <!-- 底部固定区域 -->
+            2018 &copy;
+            <a href="http://cloud.bdsmc.net/">湖南北斗微芯</a> 
+
+        </div>
+    </div>
+
+    <script src="./plugins/layui/layui.js"></script>
+    <script>
+        var message;
+        layui.config({
+            base: 'build/js/'
+        }).use(['app', 'message'], function() {
+            var app = layui.app,
+                $ = layui.jquery,
+                layer = layui.layer;
+            //将message设置为全局以便子页面调用
+            message = layui.message;
+            //主入口
+            app.set({
+                type: 'iframe'
+            }).init();
+            $('#pay').on('click', function() {
+                layer.open({
+                    title: false,
+                    type: 1,
+                    content: '<img src="/build/images/pay.png" />',
+                    area: ['500px', '250px'],
+                    shadeClose: true
+                });
+            });
+        });
+		
+    </script>
+	<script>
+        window.onload = function () {
+            var xmlhttp;
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            }
+            else {// code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+           
+            xmlhttp.onreadystatechange = function () {
+               
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data;
+              
+                    var json_m = xmlhttp.responseText;
+                    
+                    data = eval('(' + json_m + ')');
+                  
+                    var mhtml = "";
+                    for (var i = 0; i < data.length; i++) {
+                        
+                        mhtml =   mhtml+"<li class='layui-nav-item' >" +
+                        "<a class='' href='javascript:;'><i class='fa fa-plug' aria-hidden='true'></i><span>" + data[i].name + "</span></a>" +
+                                           " <dl class='layui-nav-child'>" +
+                                            "    <dd>" +
+                                             "       <a href='javascript:;' kit-target data-options=" + "{url:'member-listh.html?id=" + data[i].id + "',icon:'&#xe6c6;',title:'" + data[i].name + "汇聚端',id:" + (2 * (data[i].id)) + "}" + ">" +
+                                             "           <i class='layui-icon'>&#xe6c6;</i><span> 汇聚端</span></a>" +
+                                              "  </dd>" +
+                                                "    <dd>" +
+                                             "       <a href='javascript:;' kit-target data-options=" + "{url:'member-listuser.html?id=" + data[i].id + "',icon:'&#xe6c6;',title:'" + data[i].name + "用户管理',id:" + (2 * (data[i].id) - 1) + "}" + ">" +
+                                             "           <i class='layui-icon'>&#xe6c6;</i><span> 用户管理</span></a>" +
+                                              "  </dd>" +
+                                             
+
+                                            "</dl>";
+                       
+                    }
+                   
+                    document.getElementById("myid").innerHTML = mhtml;
+
+                }
+            }
+            xmlhttp.open("GET", "http://192.168.1.160:8000/listProjects2", false);
+            xmlhttp.send();
+
+	}
+	
+        
+	</script>
+</body>
+
+</html>

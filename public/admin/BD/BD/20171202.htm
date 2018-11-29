@@ -1,0 +1,741 @@
+﻿<HTML>
+<HEAD>
+   <meta  content="text/html; charset=UTF-8" />
+<TITLE></TITLE>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css" />
+    <style>
+        html, body{
+            margin: 0;
+            float: right;
+
+        }
+        .clear{
+            clear:both;
+            height:0;
+        }
+        #br_man{
+            text-align:center;
+            margin: 0 auto;
+            height:5px;
+            width: 1420px;
+        }
+        #left {
+           
+          
+            width: 800px;
+            height: 44px;
+            float: left;
+        }ma
+
+        #center {
+            background: #ff6a00;
+            height: 300px;
+            margin-left: 205px;
+            margin-right: 205px;
+        }
+        #right {
+            float: right;
+           
+            width: 100px;
+            height: 40px;
+
+        }
+        #left_0 {
+            width: 100%;
+            height:40px;
+         
+            
+        }
+         #left_0_1 {
+            width: 820px;
+            height: 44px;
+           
+            float: left;
+        }
+        #left_1 {
+            width: 240px;
+            height: 54px;
+            text-align:center;
+            float: left;
+        }
+
+         #left_2 {
+            width: 800px;
+            height: 60px;
+           
+            float: left;
+        }
+         #left_3 {
+            width: 15%;
+            height: 40px;
+           
+            float: left;
+        }
+         #left_3_1 {
+            width: 240px;
+            height: 54px;
+           
+            float: left;
+        }
+         #left_3_2 {
+            width: 240px;
+            height: 10px;
+           
+            float: left;
+        }
+
+         #left_4 {
+            width: 160px;
+            height: 30px;
+            border: 2px solid #239BE8;
+            border-radius: 5px;
+            background: #F9F0DA;
+            float: left;
+        }
+          #left_5 {
+            width: 120px;
+            height: 30px;
+            border: 2px solid #239BE8;
+            border-radius: 5px;
+            background: #F9F0DA;
+            float: right;
+           
+        }
+
+         #left_bt {
+            text-align:center;
+            width: 50px;
+            height: 30px;
+            margin-left: 4px;
+            float: left;
+            background:url("btn.png") ;
+            border:1px none;
+            color:white;
+        }
+        #statusbar {
+            
+             margin: 5px;
+             background:#6B7F9F;
+            
+        
+        }
+
+            
+            .popupcontent{ 
+            position: absolute; 
+            visibility: hidden; 
+            overflow: hidden; 
+            border:1px solid #CCC; 
+            background-color:#F9F9F9; 
+            border:1px solid #333; 
+            padding:5px; 
+            margin: 5px;
+            background:#6B7F9F;
+            border-radius: 15px;
+            } 
+   
+
+         .nav {
+            text-align:center;
+            width: 16%;
+            height: 30px;
+           
+            float: left;
+            color: #FFF;
+        }
+         .center {
+             text-align:center;
+         }
+         .reght_1 {
+
+         }
+
+           .marker {
+            color: #ff6600;
+            padding: 4px 10px;
+            border: 1px solid #fff;
+            white-space: nowrap;
+            font-size: 12px;
+            font-family: "";
+            background-color: #25A5F7;
+        }
+          .diyi{ position:absolute; z-index:3;}
+           .dier{ position:relative; z-index:5; }
+           .disan{ position:relative; z-index:7;}
+           .divman {
+               width: 100%;
+               height: 110px;
+              
+               text-align: center;
+               margin: 0;
+               background: #25A5F7;
+               float: left;
+               
+           }
+           .divleft {
+               width: 200px;
+               height: 100%;
+               margin: 1px;
+               text-align: center;
+               
+              
+               float: left;
+           }
+
+           .nav-left, .nav-right {
+            width: 2%;
+            height: 30px;
+            background: yellow;
+            float: left;
+        }
+
+        .nav {
+            text-align:center;
+            width: 16%;
+            height: 30px;
+            background: blue;
+            float: left;
+            color: #FFF;
+        }
+       
+
+         .dropdown {
+            position: relative;
+            display: inline-block;
+            background: #239BE8;
+        }
+        .markerpoint {
+            position:absolute; z-index:5;
+            height: 80px;
+            width:120px;
+            background:#d82b2b;
+        }
+
+
+
+        .dropdown-content {
+            display: none;
+            position: center;
+            background-color: #2CA8F7;
+            min-width: 1px;
+            box-shadow: 0px 0px 0px 0px rgba(0,0,0,0.2);
+            padding: 1px 1px;
+           
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+            
+        }
+
+         p:hover {
+             color: white;
+             background:#239BE8;
+             text-decoration:underline;
+             cursor:default;
+             border-bottom: 2px solid white ;
+
+             
+        }
+         span:hover{
+             color: white;
+             background:#239BE8;
+             width:100%;
+         }
+
+		.p_1 {
+			color: white;
+            text-decoration:none;
+           
+		}
+        p_1:hover {
+           
+        }
+		a{ text-decoration:none;
+           text-decoration-color:white;
+          
+		}
+        font{
+            color:white;
+            
+           
+        }
+
+        body {
+            background-image: url('hello_python.png');
+        }
+    </style>
+   
+    <script src="http://webapi.amap.com/maps?v=1.4.1&key=b5caf84a0917dc84ed024eb06cf40f17"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+
+</HEAD>
+
+<BODY>
+  
+   
+    <div class="dier">
+        <div  class="div-line">
+           <div class="divman">
+               <img src="logo.png" height="80"/>
+               <div id="br_man"><hr style="height:1px;border:none;border-top:2px solid #000000;" /></div>
+              
+              
+           </div>
+           
+            <div class="divman">
+             
+               <div id="left_0">
+
+                 
+                       <div style="width:100%; height:50px">
+                           
+
+                               <div id="left_3">
+
+                                   <p class="p_1">省</p>
+
+                               </div>
+                               <div id="left_3">
+
+                                   <p class="p_1">市</p>
+
+                               </div>
+                               <div id="left_3">
+
+                                   <p class="p_1">区</p>
+
+                               </div>
+                               <div id="left_3">
+
+                                   <p class="p_1">街道</p>
+                               </div>
+                          
+                       </div>
+                       <div style="width:100%; height:50px">
+                           <div class="dropdown" id="left_1" >
+                               <p class="p_1">导航</p>
+                               <div class="dropdown-content">
+                                   <span class="p_1"><a href="http://localhost:8080/test/20171202.htm"><font>传感器状态</font> </a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/table2.htm"><font>用户管理</font> </a></span><br /><br />
+                                   <span class="p_1"> <a href="http://localhost:8080/test/boxing.htm"><font>历史数据统计</font> </a></span><br /><br />
+
+                               </div>
+
+                           </div>
+                           <div class="dropdown" id="left_1">
+                               <p class="p_1" id="func1">传感器详情</p>
+                               <div class="dropdown-content" id="device_details" >
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>1</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>2</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>3</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>4</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>5</font></a></span><br /><br />
+
+
+                               </div>
+                           </div>
+
+                           <div class="dropdown" id="left_1">
+                               <p class="p_1" id="func2">报警传感器</p>
+                               <div class="dropdown-content" id="abnormal">
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>1111</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>2222</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>3333</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>4444</font></a></span><br /><br />
+                                   <span class="p_1"><a href="http://localhost:8080/test/boxing.htm"> <font>5555</font></a></span><br /><br />
+                               </div>
+                           </div>
+                           <div id="left_1">
+                               <div style="height: 12px; width:100%"></div>
+                               <div><input type="text" id="left_4" /><input type="button" value="搜索" id="left_bt"   onclick="search_ID()"/></div>
+                           </div>
+                       </div>
+                      
+               </div>
+                <div id="left_1">
+                    <div >
+                        <div id="left">
+                            
+                           
+
+                        </div>
+                        
+                    </div>
+                    
+                   
+                </div>
+                
+                       <div>
+                 
+                    </div> 
+
+               
+                <div id="right">
+                   <div id="enble"></div> 
+                   
+                </div>
+            </div>
+            
+         
+
+        </div>
+       
+    </div>
+    
+   
+    
+    <div id="container" style="height:700px; width: 90%;position: fixed;bottom: 0;margin-top: 230px; margin-left:5%; border:1px solid #25A5F7"></div>
+
+    <div class="popupcontent" id="m_makerpoint" style="height:240px; width: 380px;position: fixed;bottom: 0;margin-top: 230px; margin-left:5%; border:1px solid #25A5F7">
+
+        <div id="statusbar"><button onclick="hidePopup();">关闭</button>
+           
+        </div>
+        <div  style="height:40px;background:#F9F0DA" >编号：<input type="text" id="left_5" disabled="disabled" /></div>
+        <div  style="height:40px;background:#F9F0DA">经度：<input type="text" id="left_5" disabled="disabled"/></div>
+        <div  style="height:40px;background:#F9F0DA">纬度：<input type="text" id="left_5" disabled="disabled"/></div>
+        <div  style="height:40px;background:#F9F0DA"> 俯仰角：<input type="text" id="left_5" disabled="disabled"/></div>
+        <div  style="height:40px;background:#F9F0DA"> 方向角：<input type="text" id="left_5" disabled="disabled"/></div>
+
+     </div>
+   
+    
+
+   
+
+    
+    <script>
+        var data;
+       
+        var xmlhttp;
+
+        var marker, map = new AMap.Map("container", {
+
+            resizeEnable: true,
+            zoom: 12
+
+        });
+        window.onload = function () {
+            //插入地图
+            
+            //ToolBar
+            
+        
+        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp = new XMLHttpRequest();
+        }
+        else {// code for IE6, IE5
+            xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+        }
+       
+        xmlhttp.onreadystatechange = function (){
+		alert(xmlhttp.readyState);
+            if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                var data;
+                var json_m = xmlhttp.responseText;
+              
+                data = eval('(' + json_m + ')');
+                var equipment = "";
+                var abnormal = "";
+                for (var i = 0; i < data.EQ.length; i++) {
+
+                    equipment = "<span class='p_1'><a href='http://localhost:8080/test/boxing.htm'> <font>" + data.EQ[i].ID + "</font></a></span><br /><br />" + equipment;
+                   
+                }
+                document.getElementById("device_details").innerHTML = equipment;
+
+                for (var j = 0; j < data.AN.length; j++)
+                {
+                    abnormal = "<span class='p_1'><a href='http://localhost:8080/test/boxing.htm'> <font>" + data.AN[j].ID + "</font></a></span><br /><br />" + abnormal;
+
+                }
+              
+                document.getElementById("abnormal").innerHTML = abnormal;
+                
+                var arr_Nmarker = new Array();
+                for (var k = 0; k < data.GT.length; k++) {
+                   
+                    arr_Nmarker[k] = new AMap.Marker({
+                        icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                        position: [data.GT[k].LT, data.GT[k].LG]
+                    });
+                    arr_Nmarker[k].setMap(map);
+                        
+                        //alert(data.GT[k].LT);
+                        arr_Nmarker[k].on('click', function () {
+                           
+                        var popUp = document.getElementById("m_makerpoint");
+                        var marker_html = "";
+                        popUp.style.visibility = "visible";
+                        popUp.style.top = "250px";
+                        popUp.style.left = "600px";
+                    });
+                   
+                }
+                var arr_marker = new Array();
+                for (var m = 0; m < data.NGT.length; m++) {
+                   
+                    arr_marker[m] = new AMap.Marker({
+                        icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png",
+                        position: [data.NGT[m].LT, data.NGT[m].LG]
+                    });
+                    arr_marker[m].setMap(map);
+                    // marker.on('click', markerClick);
+                    //attachEvent("onclick", Foo);
+                    //alert(data.NGT[m].LT);
+                    arr_marker[m].on('click', function () {
+                        
+                        var popUp = document.getElementById("m_makerpoint");
+                        var marker_html = "";
+                        popUp.style.visibility = "visible";
+                        popUp.style.top = "250px";
+                        popUp.style.left = "600px";                       
+                    });
+                    
+                }
+              
+                if (data.state[0].en == 1) {
+                    sign = "<img  src='R.png' height='38' width='38'/>";
+                    document.getElementById("enble").innerHTML = sign;
+                } else {
+                    sign = "<img  src='b.png' height='38' width='38'/>";
+                    document.getElementById("enble").innerHTML = sign;
+                }
+            }
+        }
+        xmlhttp.open("POST", "4.json", true);
+        xmlhttp.send();
+       
+    }
+        document.getElementById('func1').onmouseover = function () {
+            //你的事件处理
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            }
+            else {// code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data;
+                    var json_m = xmlhttp.responseText;
+
+                    data = eval('(' + json_m + ')');
+                    var equipment = "";
+                    var abnormal = "";
+
+                    for (var i = 0; i < data.EQ.length; i++) {
+
+                        equipment = "<span class='p_1'><a href='http://localhost:8080/test/boxing.htm'> <font>" + data.EQ[i].ID + "</font></a></span><br /><br />" + equipment;
+
+                    }
+                    document.getElementById("device_details").innerHTML = equipment;
+
+                    for (var j = 0; j < data.AN.length; j++) {
+                        abnormal = "<span class='p_1'><a href='http://localhost:8080/test/boxing.htm'> <font>" + data.AN[j].ID + "</font></a></span><br /><br />" + abnormal;
+
+                    }
+
+                    document.getElementById("abnormal").innerHTML = abnormal;
+
+                    var arr_Nmarker = new Array();
+                    for (var k = 0; k < data.GT.length; k++) {
+                       
+                        arr_Nmarker[k] = new AMap.Marker({
+                            icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                            position: [data.GT[k].LT, data.GT[k].LG]
+                        });
+                        arr_Nmarker[k].setMap(map);
+                       
+                        arr_Nmarker[k].on('click', function () {
+                           
+                            var popUp = document.getElementById("m_makerpoint");
+                            var marker_html = "";
+                            popUp.style.visibility = "visible";
+                            popUp.style.top = "250px";
+                            popUp.style.left = "600px";
+                        });
+
+                    }
+                    var arr_marker = new Array();
+                    for (var m = 0; m < data.NGT.length; m++) {
+                        
+                        arr_marker[m] = new AMap.Marker({
+                            icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png",
+                            position: [data.NGT[m].LT, data.NGT[m].LG]
+                        });
+                        arr_marker[m].setMap(map);
+                        // marker.on('click', markerClick);
+                        //attachEvent("onclick", Foo);
+
+                        arr_marker[m].on('click', function () {
+                            
+                            var popUp = document.getElementById("m_makerpoint");
+                            var marker_html = "";
+                            popUp.style.visibility = "visible";
+                            popUp.style.top = "250px";
+                            popUp.style.left = "600px";
+                        });
+
+                    }
+                    if (data.state[0].en == 1) {
+                        sign = "<img  src='R.png' height='38' width='38'/>";
+                        document.getElementById("enble").innerHTML = sign;
+                    } else {
+                        sign = "<img  src='b.png' height='38' width='38'/>";
+                        document.getElementById("enble").innerHTML = sign;
+                    }
+
+
+
+                }
+            }
+
+
+            xmlhttp.open("POST", "4.json", true);
+            xmlhttp.send();
+        }
+        
+        document.getElementById('func2').onmouseover = function () {
+            //你的事件处理
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            }
+            else {// code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+           
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                    var data;
+                    var json_m = xmlhttp.responseText;
+
+                    data = eval('(' + json_m + ')');
+                    var equipment = "";
+                    var abnormal = "";
+                    var sign = "";
+                    for (var i = 0; i < data.EQ.length; i++) {
+
+                        equipment = "<span class='p_1'><a href='http://localhost:8080/test/boxing.htm'> <font>" + data.EQ[i].ID + "</font></a></span><br /><br />" + equipment;
+
+                    }
+                    document.getElementById("device_details").innerHTML = equipment;
+
+                    for (var j = 0; j < data.AN.length; j++) {
+                        abnormal = "<span class='p_1'><a href='http://localhost:8080/test/boxing.htm'> <font>" + data.AN[j].ID + "</font></a></span><br /><br />" + abnormal;
+
+                    }
+
+                    document.getElementById("abnormal").innerHTML = abnormal;
+
+                    var arr_Nmarker = new Array();
+                    for (var k = 0; k < data.GT.length; k++) {
+
+                        arr_Nmarker[k] = new AMap.Marker({
+                            icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_b.png",
+                            position: [data.GT[k].LT, data.GT[k].LG]
+                        });
+                        arr_Nmarker[k].setMap(map);
+
+                        arr_Nmarker[k].on('click', function () {
+
+                            var popUp = document.getElementById("m_makerpoint");
+                            var marker_html = "";
+                            popUp.style.visibility = "visible";
+                            popUp.style.top = "250px";
+                            popUp.style.left = "600px";
+                        });
+
+                    }
+                    var arr_marker = new Array();
+                    for (var m = 0; m < data.NGT.length; m++) {
+
+                        arr_marker[m] = new AMap.Marker({
+                            icon: "http://webapi.amap.com/theme/v1.3/markers/n/mark_r.png",
+                            position: [data.NGT[m].LT, data.NGT[m].LG]
+                        });
+                        arr_marker[m].setMap(map);
+                        // marker.on('click', markerClick);
+                        //attachEvent("onclick", Foo);
+
+                        arr_marker[m].on('click', function () {
+
+                            var popUp = document.getElementById("m_makerpoint");
+                            var marker_html = "";
+                            popUp.style.visibility = "visible";
+                            popUp.style.top = "250px";
+                            popUp.style.left = "600px";
+                        });
+
+                    }
+
+                if (data.state[0].en == 1) {
+                    sign = "<img  src='R.png' height='38' width='38'/>";
+                    document.getElementById("enble").innerHTML = sign;
+                } else {
+                    sign = "<img  src='b.png' height='38' width='38'/>";
+                    document.getElementById("enble").innerHTML = sign;
+                }
+
+                }
+            }
+
+
+            xmlhttp.open("POST", "4.json", true);
+            xmlhttp.send();
+        }
+
+
+        
+        function search_ID()
+        {
+           
+         
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            }
+            else {// code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+           
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                   
+                    var data;
+                    var json_m = xmlhttp.responseText;
+
+                    data = eval('(' + json_m + ')');
+                  
+                    if (data.SCH[0].LG != null)
+                    {
+                        //地图焦点位移
+                                           
+                        map.setZoomAndCenter(17, [data.SCH[0].LT, data.SCH[0].LG]);
+                        // 在新中心点添加 marker 
+                        var marker = new AMap.Marker({
+                            map: map,
+                            position: [116.205467, 39.907761]
+                        });                    
+                    }
+
+                }
+            }
+           
+            m_search = document.getElementById("left_4").value;
+          
+            var murl = "4.json?ID=" + m_search;
+           // alert(murl);
+            xmlhttp.open("POST", murl, true);
+            xmlhttp.send();
+            
+        }
+        function hidePopup() {
+            var popUp = document.getElementById("m_makerpoint");
+            popUp.style.visibility = "hidden";
+        }
+
+    </script>
+</BODY>
+</HTML>

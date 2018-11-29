@@ -1,0 +1,306 @@
+﻿<!DOCTYPE html>
+<html>
+  
+  <head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.0</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/xadmin.css">
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript" src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+      <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+      <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  
+  <body>
+    <div class="x-body">
+        <form class="layui-form">
+       <!-- <div class="layui-form-item">
+              <label  class="layui-form-label">
+                  <span class="x-red">*</span>id
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="id" name="id" required=""  class="layui-input">
+              </div>
+              <!--<div class="layui-form-mid layui-word-aux">
+                  <span class="x-red">*</span>将会成为您唯1的登入名
+              </div>-->
+      
+          <!--<div class="layui-form-item">
+              <label  class="layui-form-label">
+                  <span class="x-red">*</span>poi_id
+              </label>
+              <div class="layui-input-inline">
+                  <input type="text" id="poi_id" name="poi_id" required="" lay-verify="nikename"
+                  autocomplete="off" class="layui-input">
+              </div>
+          </div>-->
+         
+		  <div class="layui-form-item">
+              <label  class="layui-form-label">
+                  <span class="x-red">名称*</span>
+              </label>
+              <div class="layui-input-inline">
+                  
+                  <select id="attribute">
+                      <option value="4">方向角x</option>
+                      <option value="5">俯仰角y</option>
+                      <option value="6">横滚角z</option>
+                      <option value="7">高度</option>
+                  </select>
+              </div>
+          </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>采集端Mac
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="id2" name="id2" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>值
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="value1" name="value1" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <!--<div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>类型
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="type" name="type" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>-->
+            <!--<div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>值
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="value1" name="value1" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>-->
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>单位
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="unit" name="unit" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>一级预警上限
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="up1" name="up1" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>一级预警下限
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="down1" name="down1" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>二级预警上限
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="up2" name="up2" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    <span class="x-red">*</span>二级预警下限
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" id="down2" name="down2" required="" lay-verify="nikename"
+                           autocomplete="off" class="layui-input">
+                </div>
+            </div>
+            
+          <div class="layui-form-item">
+              <label  class="layui-form-label">
+              </label>
+              <button  class="layui-btn" lay-filter="add" lay-submit="" onclick="addSensor()">
+                  增加采集器属性
+              </button>
+          </div>
+      </form>
+    </div>
+    <script>
+        var poi_id;
+       
+        window.onload = function () {
+           
+            function GetQueryString(name) {
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+                var r = window.location.search.substr(1).match(reg);
+                if (r != null) return unescape(r[2]); return null;
+            }
+            poi_id = unescape(GetQueryString("id"));
+           
+           
+        }
+        function addSensor() {
+          
+            //var name = document.getElementById("name").value;
+            //  var id2 = document.getElementById("id2").value;
+           
+            var v = document.getElementById("attribute");
+            var index = v.selectedIndex;
+            alert(v.options[index].text);
+            alert(v.options[index].value);
+
+            
+            var tom = document.getElementById("id2").value;
+            var id2 = (tom << 16) | (v.options[index].value);
+            
+           // var type = document.getElementById("type").value;
+            var unit = document.getElementById("unit").value;
+            var up1 = document.getElementById("up1").value;
+            var down1 = document.getElementById("down1").value;
+            var up2 = document.getElementById("up2").value;
+            var down2 = document.getElementById("down2").value;
+            var value1 = document.getElementById("value1").value;
+          
+            if (name.length > 20) {
+                x_admin_close();
+                alert("名称字段在20字节内");
+                return false;
+            }
+            if (id2.length > 8) {
+                x_admin_close();
+                alert("采集端Mac字段在8字节内");
+                return false;
+            }
+            if (up1.length > 8) {
+                x_admin_close();
+                alert("一级预警上限字段在8字节内");
+                return false;
+            }
+            if (down1.length > 8) {
+                x_admin_close();
+                alert("一级预警下限字段在8字节内");
+                return false;
+            }
+            if (up2.length > 8) {
+                x_admin_close();
+                alert("二级预警上限字段在8字节内");
+                return false;
+            }
+            if (down2.length > 8) {
+                x_admin_close();
+                alert("二级预警下限字段在8字节内");
+                return false;
+            }
+            if (value1.length > 11) {
+                x_admin_close();
+                alert("值字段在11字节内");
+                return false;
+            }
+            //if (type.length > 5) {
+            //    alert("类型字段在5字节内");
+
+            //}
+            if (unit.length > 5) {
+                x_admin_close();
+                alert("单位段在5字节内");
+                return false;
+            }
+            var xmlhttp;
+            if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+                xmlhttp = new XMLHttpRequest();
+            }
+            else {// code for IE6, IE5
+                xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+            }
+          
+            xmlhttp.onreadystatechange = function () {
+               
+                if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+                   
+                    var data;
+                    var json_m = xmlhttp.responseText;
+                   
+                    data = eval('(' + json_m + ')');
+                   
+                   
+                    if (data.message == "add_ok") {
+                       
+                        x_admin_close();
+                    }
+                }
+            }
+           
+            xmlhttp.open("GET", "http://192.168.1.160:8000/addSensor2?device_id=" + poi_id + "&name=" + (v.options[index].text) + "&unit=" + unit + "&up1=" + up1 + "&down1=" + down1 + "&up2=" + up2 + "&down2=" + down2 + "&value=" + value1 + "&id2=" + id2, false);
+            xmlhttp.send();
+            
+        }
+        
+        /*layui.use(['form','layer'], function(){
+            $ = layui.jquery;
+          var form = layui.form
+          ,layer = layui.layer;
+        
+          //自定义验证规则
+          form.verify({
+            nikename: function(value){
+              if(value.length < 5){
+                return '昵称至少得5个字符啊';
+              }
+            }
+            ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+            ,repass: function(value){
+                if($('#L_pass').val()!=$('#L_repass').val()){
+                    return '两次密码不一致';
+                }
+            }
+          });
+
+          //监听提交
+          form.on('submit(add)', function(data){
+            console.log(data);
+            //发异步，把数据提交给php
+            layer.alert("增加成功", {icon: 6},function () {
+                // 获得frame索引
+                var index = parent.layer.getFrameIndex(window.name);
+                //关闭当前frame
+                parent.layer.close(index);
+            });
+            return false;
+          });
+          
+          
+        });*/
+    </script>
+    <script>var _hmt = _hmt || []; (function() {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?b393d153aeb26b46e9431fabaf0f6190";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();</script>
+  </body>
+
+</html>

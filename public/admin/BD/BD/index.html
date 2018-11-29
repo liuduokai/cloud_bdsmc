@@ -1,0 +1,255 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>后台系统管理</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="./css/font.css">
+	<link rel="stylesheet" href="./css/xadmin.css">
+	<link rel="stylesheet" href="./plugins/layui/css/layui.css" media="all">
+    <link rel="stylesheet" type="text/css" href="http://cdn.bootcss.com/font-awesome/4.6.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="./build/css/app.css" media="all">
+	
+	
+    <script type="text/javascript" src="js/manTable.js"></script>
+    <script src="./lib/layui/layui.js" charset="utf-8"></script>
+    <script type="text/javascript" src="./js/xadmin.js"></script>
+
+</head>
+<body>
+    <!-- 顶部开始 -->
+    <div class="container">
+        <div class="logo"><a href="./index.html">北斗微芯后台管理系统</a></div>
+        <div class="left_open">
+            <i title="展开左侧栏" class="iconfont">&#xe699;</i>
+        </div>
+        <ul class="layui-nav left fast-add" lay-filter="">
+          <li class="layui-nav-item">
+            <a href="javascript:;">+新增</a>
+            <dl class="layui-nav-child"> <!-- 二级菜单 -->
+              <dd><a onclick="addproc()"><i class="iconfont">&#xe6a2;</i>项目</a></dd>
+              <dd><a onclick="x_admin_show('图片','http://www.baidu.com')"><i class="iconfont">&#xe6a8;</i>图片</a></dd>
+               <dd><a onclick="x_admin_show('用户','http://www.baidu.com')"><i class="iconfont">&#xe6b8;</i>用户</a></dd>
+            </dl>
+          </li>
+        </ul>
+        <ul class="layui-nav right" lay-filter="">
+          <li class="layui-nav-item">
+            <a href="javascript:;">admin</a>
+            <dl class="layui-nav-child"> <!-- 二级菜单 -->
+              <dd><a onclick="x_admin_show('个人信息','http://www.baidu.com')">个人信息</a></dd>
+              <dd><a onclick="x_admin_show('切换帐号','http://www.baidu.com')">切换帐号</a></dd>
+              <dd><a href="./login.html">退出</a></dd>
+            </dl>
+          </li>
+          <li class="layui-nav-item to-index"><a href="/">前台首页</a></li>
+        </ul>
+        
+    </div>
+    <!-- 顶部结束 -->
+    <!-- 中部开始 -->
+     <!-- 左侧菜单开始 -->
+    <div class="left-nav">
+      <div id="side-nav">
+        <ul id="nav">
+            <li>
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b8;</i>
+                    <cite>地址灾害</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+				 <ul class="sub-menu">
+                    <li>
+                        <a _href="member-list.html">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>管理员账户列表</cite>
+                            
+                        </a>
+                    </li >
+                  
+                </ul>
+				<ul class="sub-menu">
+                    <li>
+                        <a _href="member-listpc.html">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>传感器列表</cite>
+                            
+                        </a>
+                    </li >
+                  
+                </ul>
+			</li>
+            <li>
+                <a href='javascript:;'>
+                    <i class='iconfont'>&#xe6b8;</i><cite>
+                        
+                            地址灾害
+                    </cite><i class='iconfont nav_right'>&#xe697;</i>
+                </a> <ul class='sub-menu'>
+                    <li>
+                        <a _href='member-list.html'>
+                            <i class='iconfont'>&#xe6a7;</i><cite>
+                               
+                               管理员账户列表
+                            </cite>
+                        </a>
+                    </li>
+                </ul><ul class='sub-menu'>
+                    <li>
+                        <a _href='member-listpc.html'>
+                            <i class='iconfont'>&#xe6a7;</i><cite>
+                                
+                               传感器列表
+                            </cite>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+			<li>
+                <a href="javascript:;">
+                    <i class="iconfont">&#xe6b8;</i>
+                    <cite>天线检测</cite>
+                    <i class="iconfont nav_right">&#xe697;</i>
+                </a>
+                
+				 <ul class="sub-menu">
+                    <li>
+                        <a _href="member-list.html">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>管理员账户列表</cite>
+                            
+                        </a>
+                    </li >
+                    
+                </ul>
+				<ul class="sub-menu">
+                    <li>
+                        <a _href="member-listpc.html">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>传感器列表</cite>
+                            
+                        </a>
+                    </li >
+                    
+                </ul>
+			</li>
+
+
+
+            <li>
+            <a href='javascript:;'><i class='iconfont'>&#xe6b8;</i><cite>地址灾害</cite><i class='iconfont nav_right'>&#xe697;</i></a> <ul class='sub-menu'><li><a href='member-list.html'><i class='iconfont'>&#xe6a7;</i><cite>管理员账户列表</cite></a></li></ul> <ul class='sub-menu'><li><a href='member-listpc.html'><i class='iconfont'>&#xe6a7;</i> <cite>传感器列表</cite></a></li> </ul>
+          </li>
+           
+        </ul>
+      </div>
+    </div>
+    <!-- <div class="x-slide_left"></div> -->
+    <!-- 左侧菜单结束 -->
+    <!-- 右侧主体开始 -->
+    <div class="page-content">
+        <div class="layui-tab tab" lay-filter="xbs_tab" lay-allowclose="false">
+          <ul class="layui-tab-title">
+            <li>北斗微芯技术信息</li>
+          </ul>
+          <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <iframe src='./welcome.html' frameborder="0" scrolling="yes" class="x-iframe"></iframe>
+            </div>
+          </div>
+        </div>
+    </div>
+    <div class="page-content-bg"></div>
+    <!-- 右侧主体结束 -->
+    <!-- 中部结束 -->
+    <!-- 底部开始 -->
+    <div class="footer">
+        <div class="copyright"> 湖南北斗微芯</div>  
+    </div>
+    <!-- 底部结束 -->
+   
+	
+	
+</body>
+
+
+</html>
+<script>
+    var data;
+    var xmlhttp;
+
+
+		window.onload = function () {
+		/*var mhtml="";
+		
+	for(var i =0; i < 10; i++){
+	mhtml = "<li class='layui-nav-item' >"+
+	"<a class='' href='javascript:;'><i class='fa fa-plug' aria-hidden='true'></i><span> 基本元素</span></a>"+
+                       " <dl class='layui-nav-child'>"+
+                        "    <dd>"+
+                         "       <a href='javascript:;' kit-target data-options="+"{url:'test.html',icon:'&#xe6c6;',title:'表格',id:'1'}"+">"+
+                         "           <i class='layui-icon'>&#xe6c6;</i><span> 表格</span></a>"+
+                          "  </dd>"+
+                           " <dd>"+
+                           "     <a href='javascript:;' data-url='form.html' data-icon='fa-user' data-title='表单' kit-target data-id='2'><i class='fa fa-user' aria-hidden='true'></i><span> 表单</span></a>"+
+                           " </dd>"+
+                            
+                        "</dl>" + mhtml;
+						}
+		
+	document.getElementById("nav").innerHTML = mhtml;*/
+            alert(sss);
+			if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+			    xmlhttp = new XMLHttpRequest();
+
+			}
+			else {// code for IE6, IE5
+				xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+
+			}
+            
+			xmlhttp.onreadystatechange = function(){
+
+			    //alert(xmlhttp.readyState + "" + xmlhttp.status);
+				if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+					var data;
+					var json_m = xmlhttp.responseText;
+					data = eval('(' + json_m + ')');
+
+					var abnormal = "";
+					
+					
+					for (var i = 0; i < data.EQ.length; i++) {
+
+					    abnormal = "<li ><a href='javascript:;'><i class='iconfont'>&#xe6b8;</i><cite>" +
+                            "地址灾害</cite><i class='iconfont nav_right'>&#xe697;</i></a> <ul class='sub-menu'><li><a _href='member-list.html'><i class='iconfont'>&#xe6a7;</i><cite>" +
+                            "管理员账户列表</cite> </a></li ></ul><ul class='sub-menu'><li><a _href='member-listpc.html'><i class='iconfont'>&#xe6a7;</i><cite>" +
+                            "传感器列表</cite></a></li > </ul></li>" + abnormal;
+					//abnormal = "<li><a href=" + "javascript:;" + "><i class=" + "iconfont" + ">" + "&#xe6b8;" + "</i><cite>" + "地址灾害" + "</cite><i class=" + "iconfont nav_right" + ">" + "&#xe697;" + "</i> </a> <ul class=" + "sub-menu" + "><li><a _href=" + "member-list.html" + "><i class=" + "iconfont" + ">" + "&#xe6a7;" + "</i><cite>" + "管理员账户列表" + "</cite> </a></li ></ul><ul class=" + "sub-menu" + ">  <li><a _href=" + "member-listpc.html" + "><i class=" + "iconfont" + ">" + "&#xe6a7;" + "</i><cite>" + "传感器列表" + "</cite></a></li > </ul></li>" + "" + abnormal;
+					    //alert(abnormal);
+					    //alert(eval('(' + abnormal + ')'));
+					    //abnormal = " <li class='open'> <a href='javascript:;'><i class='iconfont'>&#xe6b8;</i><cite>地址灾害</cite><i class='iconfont nav_right'>&#xe697;</i></a> <ul class='sub-menu'><li><a _href='member-list.html'><i class='iconfont'>&#xe6a7;</i><cite>管理员账户列表</cite></a></li></ul> <ul class='sub-menu'><li><a _href='member-listpc.html'><i class='iconfont'>&#xe6a7;</i> <cite>传感器列表</cite></a></li> </ul></li>" + abnormal;;
+					// abnormal = "<li><a href='javascript:;'><i class='iconfont'>&#xe6b8;</i><cite>地址灾害</cite><i class='iconfont nav_right'>&#xe697;</i></a> <ul class='sub-menu'><li><a href='member-list.html'><i class='iconfont'>&#xe6a7;</i><cite>管理员账户列表</cite></a></li></ul> <ul class='sub-menu'><li><a href='member-listpc.html'><i class='iconfont'>&#xe6a7;</i> <cite>传感器列表</cite></a></li> </ul></li>";
+					}
+					//alert(document.getElementById("nav").innerHTML + "");
+					document.getElementById("nav").innerHTML = abnormal;
+					//alert(document.getElementById("nav").innerHTML + "");
+				}
+
+			}
+			     xmlhttp.open("POST", "4.json", true);
+				 xmlhttp.send();
+
+		}
+
+		function addproc() {
+		    alert("insert program");
+
+		}
+
+</script>

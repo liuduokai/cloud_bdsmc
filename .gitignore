@@ -17,7 +17,3 @@
 *.ipr
 
 ### NetBeans ###
-/bootstrap/
-/packages/
-/public/
-.env
