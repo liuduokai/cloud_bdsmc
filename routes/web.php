@@ -400,3 +400,7 @@ $router->options('/getSomeThingByDeviceId', ['middleware' => 'cors','uses' => 'P
 $router->post('/getOtherThingsByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByDeviceId']);
 $router->get('/getOtherThingsByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByDeviceId']);
 $router->options('/getOtherThingsByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getOtherThingsByDeviceId']);
+
+$router->post('/getSensorInfoByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getSensorInfoByDeviceId']);
+$router->get('/getSensorInfoByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getSensorInfoByDeviceId']);
+$router->options('/getSensorInfoByDeviceId', ['middleware' => 'cors','uses' => 'PoiController@getSensorInfoByDeviceId']);

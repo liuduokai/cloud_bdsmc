@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use function MongoDB\BSON\fromJSON;
 use phpDocumentor\Reflection\Types\Null_;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -74,6 +75,7 @@ class PoiController extends Controller
                 'listPois',
                 'deviceData2',
                 'acceptNBData',
+                'getSensorInfoByDeviceId',
             ]]);
 
         DB::connection()->enableQueryLog();
@@ -2223,11 +2225,12 @@ class PoiController extends Controller
     public function getSomeThingByProjectId(Request $request){
         $this->validate($request, [
             'projectId' => 'required',
+            'recentUpdate'=>'numeric'
         ]);
 
         $project_id = $request->projectId;
         if($request->has('online') && $request->has('recentUpdate')){
-            if($request->recentUpdate === 0){
+            if((int)($request->recentUpdate) === 0){
                 $result = DB::select('select 
 	baseInf.projectId, baseInf.projectName, baseInf.poiId
 	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
@@ -2318,7 +2321,7 @@ where
 	baseInf.online = ?
 	and dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id,$request->online]);
             }
-            if($request->recentUpdate === 1){
+            if((int)($request->recentUpdate) === 1){
                 $result = DB::select('select 
 	baseInf.projectId, baseInf.projectName, baseInf.poiId
 	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
@@ -2409,7 +2412,7 @@ where
 	baseInf.online = ?
 	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id,$request->online]);
             }
-            if($request->recentUpdate === 2){
+            if((int)($request->recentUpdate) === 2){
                 $result = DB::select('select 
 	baseInf.projectId, baseInf.projectName, baseInf.poiId
 	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
@@ -2590,7 +2593,7 @@ from
 where 
 	baseInf.online = ?;', [$project_id,$project_id,$project_id,$request->online]);
         }else if($request->has('recentUpdate')){
-            if($request->recentUpdate === 0){
+            if((int)($request->recentUpdate) === 0){
                 $result = DB::select('select 
 	baseInf.projectId, baseInf.projectName, baseInf.poiId
 	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
@@ -2678,9 +2681,9 @@ from
 			maxId.maxId is not NULL
     ) dataInf on baseInf.deviceId = dataInf.deviceId
 where 
-	and dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id]);
+	 dataInf.gps_time is NULL;', [$project_id,$project_id,$project_id]);
             }
-            if($request->recentUpdate === 1){
+            if((int)($request->recentUpdate) === 1){
                 $result = DB::select('select 
 	baseInf.projectId, baseInf.projectName, baseInf.poiId
 	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
@@ -2768,9 +2771,9 @@ from
 			maxId.maxId is not NULL
     ) dataInf on baseInf.deviceId = dataInf.deviceId
 where 
-	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id]);
+	TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) >=2;', [$project_id,$project_id,$project_id]);
             }
-            if($request->recentUpdate === 2){
+            if((int)($request->recentUpdate) === 2){
                 $result = DB::select('select 
 	baseInf.projectId, baseInf.projectName, baseInf.poiId
 	, concat(baseInf.poiName,"-",baseInf.poiLocation) as poiName
@@ -2858,7 +2861,7 @@ from
 			maxId.maxId is not NULL
     ) dataInf on baseInf.deviceId = dataInf.deviceId
 where 
-	and TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) < 2;', [$project_id,$project_id,$project_id]);
+	TIMESTAMPDIFF(HOUR, dataInf.gps_time, now()) < 2;', [$project_id,$project_id,$project_id]);
             }
         }else{
             $result = DB::select('select 
@@ -3008,7 +3011,36 @@ where
     public function getOtherThingsByDeviceId(Request $request){
         $this->validate($request, [
             'deviceId' => 'required',
+            'pageNumber'=> 'required',
+            'pageSize'=> 'required'
         ]);
+
+        $sensor_count = DB::select('select 
+    count(*) as count
+from 
+    devices A 
+    left join sensors B on A.id = B.device_id
+where 
+    A.deleted_at is NULL 
+    and B.deleted_at is NULL
+    and A.id = ?',[$request->deviceId]);
+        //return response()->json($sensor_count[0]->count);
+        $offset = $sensor_count[0]->count*($request->pageNumber-1)*$request->pageSize;
+        $take = $sensor_count[0]->count*$request->pageSize;
+
+        $total_count = DB::select('select 
+	count(*) as count
+from 
+	devices A
+    left join sensors B on A.id = B.device_id
+    left join displacementsensor1 C on B.id = C.device_id
+where 
+	A.id = ?
+    and A.deleted_at is NULL
+    and B.deleted_at is NULL
+order by  C.id desc',
+            [$request->deviceId]);
+
         $result = DB::select('select 
 	A.id as deviceId, A.mac as deviceMac, A.name as deviceName
     , B.id as sensorId, B.name as sensorName
@@ -3021,9 +3053,193 @@ where
 	A.id = ?
     and A.deleted_at is NULL
     and B.deleted_at is NULL
-order by A.id, B.id, C.id desc',
-            [$request->deviceId]);
-        return response()->json($result);
+order by  C.id desc
+limit  ?,? ',
+            [$request->deviceId,$offset,$take]);
+        return response()->json(['count'=>($total_count[0]->count)/$sensor_count[0]->count,'result'=>$result]);
+    }
+
+    public function getSensorInfoByDeviceId(Request $request)
+    {
+        $this->validate($request, [
+            'deviceId' => 'required',
+            'pageNumber'=> 'required',
+            'pageSize'=> 'required'
+        ]);
+
+        $device_id = $request->deviceId;
+
+        $sensors_count = DB::table('sensors')
+            ->join('devices', 'devices.id', '=', 'sensors.device_id')
+            ->select('sensors.name','sensors.id')
+            ->where([
+                ['devices.id', '=', $device_id],
+                ['devices.deleted_at', '=', NULL]
+            ])
+            ->count();
+
+        //return $sensors_count;
+        $sensors = DB::table('sensors')
+            ->join('devices', 'devices.id', '=', 'sensors.device_id')
+            ->select('sensors.name','sensors.id')
+            ->where([
+                ['devices.id', '=', $device_id],
+                ['devices.deleted_at', '=', NULL]
+            ])
+            ->get();
+        foreach ($sensors as $sensor){
+            $sensorsArray[] =$sensor->name;
+        }
+
+        foreach ($sensors as $sensor){
+            $sensorsIdArrays[] =$sensor->id;
+        }
+        //return $sensorsIdArrays;
+        $sensorsArray[] = '时间';
+        //return response()->json($sensorsArray);
+        //return $sensorsArray;
+
+        $sql_where = array();
+        $sql_part_project_id = ['devices.id', '=', $device_id];
+        $sql_part_project_not_null = ['devices.deleted_at', '=', NULL];
+        array_push($sql_where,$sql_part_project_id);
+        array_push($sql_where,$sql_part_project_not_null);
+        if($request->has('starttime') ||$request->has('endtime') ){
+
+            if($request->has('starttime') && $request->has('endtime')){
+                $start = date_create($request->starttime);
+                $end = date_create($request->endtime);
+            }elseif($request->has('endtime')){
+                $start = date_create('1970-01-01 00:00:00');
+                $end = date_create($request->endtime);
+            }else{
+                $start = date_create($request->starttime);
+                $end = date_create();
+            }
+
+
+            $sql_part_time_s = ['alarmsDevice.time','>',$start];
+            $sql_part_time_e =['alarmsDevice.time','<',$end];
+
+            array_push($sql_where,$sql_part_time_s);
+            array_push($sql_where,$sql_part_time_e);
+
+        }
+
+
+        $datas = DB::table('sensors')
+            ->join('devices', 'devices.id', '=', 'sensors.device_id')
+            ->join('displacementsensor1', 'sensors.id', '=', 'displacementsensor1.device_id')
+            ->select('displacementsensor1.*', 'sensors.name')
+            ->where($sql_where)
+            ->groupby('displacementsensor1.gps_time', 'displacementsensor1.device_id')
+            ->orderBy('displacementsensor1.gps_time', 'asc')
+            ->skip($sensors_count*($request->pageNumber-1)*$request->pageSize)
+            ->take($sensors_count*$request->pageSize)
+            ->get();
+        $temp_time = null;
+        foreach ($datas as $data) {
+            $result[$data->gps_time][] = $data;
+        }
+        if (!isset($result)) {
+            $result = json_encode((object)null);
+        }
+
+        /*foreach ($result as $key => $value){
+            $value[] = $key;
+            $results[] = $value;
+        }*/
+
+        foreach ($result as $resulKey=>$resulValue){
+            foreach ($sensorsIdArrays as $sensorsIdArray){
+                $tempIdToDatas[$sensorsIdArray] = NULL;
+            }
+            foreach ($resulValue as $resulValu){
+                $tempIdToDatas[$resulValu->device_id] = $resulValu->displacement;
+            }
+            foreach ($tempIdToDatas as $tempIdToDataKey => $tempIdToDataValue ){
+                $result_final_part[] =  $tempIdToDataValue;
+            }
+            $result_final_part[] = $resulKey;
+            $result_final_full[] =$result_final_part;
+            unset($result_final_part);
+        }
+
+        //$result = get_object_vars($result);
+        return response()->json(['sensorsArray' =>$sensorsArray, 'data' => $result_final_full]);
+    }
+
+    public function searchPoiWithCorrectDevice(Request $request, $q)
+    {
+        $pinyin = new Pinyin();
+        $project_id = $this->guard()->user()->project_id;
+        $sId = $q;
+
+        $devices = Device::search($sId)
+            ->where('devices.deleted_at', '=', NULL)
+            ->get();
+        foreach ($devices as $device) {
+            if ($device->poi != null)
+                $poiss[$device->poi->id] = $device->poi;
+        }
+        $count = 1;
+        if(isset($poiss)) {
+            foreach ($poiss as $poi) {
+                //return response()->json(['type'=>gettype($poi),'project_id'=>$poi->project_id,'poi_name'=>$poi->name]);
+                if ($poi->project_id === $project_id || $this->guard()->user()->type === 1) { //权限控制，测试版本暂时不加入相应功能
+                    $poi_name = $poi->name;
+
+                    $poi["pinyin"] = $pinyin->convert($poi_name)[0][0];
+                    $photos = $poi->photos;
+                    foreach ($photos as $photo) {
+                        $photo["devices"] = $photo->photopostions;
+                    }
+                    $poi["photos"] = $photos;
+                    $poi["devices2"] = $poi->devices;
+                    $pois_id[] = $poi;
+                    //$count++;
+                }
+            }
+        }
+
+        //根据监测点名搜索
+        if ($this->guard()->user()->type == 1)
+            //$pois = Poi::where('project_id', $this->guard()->user()->project_id)->get();
+
+            $pois_name = Poi::search(urldecode($q))
+                //->where
+                ->get();
+        else {
+            $pois_name = Poi::search(urldecode($q))
+                ->where('project_id',$project_id)
+                ->get();
+        }
+
+
+        foreach ($pois_name as $poi) {
+            $poi["pinyin"] = $pinyin->convert($poi->name)[0][0];
+
+
+            $photos = $poi->photos;
+            foreach ($photos as $photo) {
+                $photo["devices"] = $photo->photopostions;
+            }
+
+            $poi["photos"] = $photos;
+            $poi["devices2"] = $poi->devices;
+
+            //$poi["photos"] = Photo::where('poi_id',$poi->id)->get();
+            //$poi["photos"] = \App\Photo::all();
+            //$queries    = DB::getQueryLog();
+            //$last_query = end($queries);
+            //dd($last_query);
+        }
+
+        if (isset($pois_id))
+            $pois = $pois_id;
+        else
+            $pois = $pois_name;
+        return response()->json($pois);
     }
 
 
@@ -3044,7 +3260,7 @@ order by A.id, B.id, C.id desc',
         $this->validate($request, [
             'projectId' => 'required',
         ]);
-
+        $project_name = '';
         $project_id = $request->projectId;
         if($request->has('online') && $request->has('recentUpdate')){
            if($request->recentUpdate === 0){
@@ -3770,6 +3986,183 @@ from
 where 
 	1=1;', [$project_id,$project_id,$project_id]);
         }
-        return response()->json($result);
+
+        $A_S = 2;
+        $B_S = 2;
+        $C_S = 2;
+
+        $A_T = -1;
+        $B_T = -1;
+        $C_T = -1;
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1','项目名称');
+        $sheet->setCellValue('B1', '监测点名称');
+        $sheet->setCellValue('C1', '设备类型');
+        $sheet->setCellValue('D1', '设备名称');
+        $sheet->setCellValue('E1', '设备数量');
+        $sheet->setCellValue('F1', '设备MAC');
+        $sheet->setCellValue('G1', '设备ID');
+        $sheet->setCellValue('H1', '是否在线');
+        $sheet->setCellValue('I1', '时间');
+        $sheet->setCellValue('J1', '传感器ID');
+        $sheet->setCellValue('K1', '传感器数据');
+
+        $row = 2;
+
+        foreach ($result as $resul) {
+            if($A_T === -1 && $B_T === -1 && $C_T === -1){
+                $A_T = $resul->projectId;
+                $B_T = $resul->poiId;
+                $C_T = $resul->device_type;
+            }
+            $project_name = $resul->projectName;
+            $sheet->setCellValue('A' . $row, $resul->projectName);
+            $sheet->setCellValue('B' . $row, $resul->poiName);
+            $sheet->setCellValue('C' . $row, $resul->device_type);
+            $sheet->setCellValue('D' . $row, $resul->deviceTypeName);
+            $sheet->setCellValue('E' . $row, $resul->deviceNum);
+            $sheet->setCellValue('F' . $row, $resul->mac);
+            $sheet->setCellValue('G' . $row, $resul->deviceId);
+            $sheet->setCellValue('H' . $row, $resul->online);
+            $sheet->setCellValue('I' . $row, $resul->gps_time);
+            $sheet->setCellValue('J' . $row, $resul->sensorId);
+            $sheet->setCellValue('K' . $row, $resul->data);
+            if($A_T != $resul->projectId){
+                $A_T_S = 'A'.(string)$A_S.':'.'A'.(string)($row-1);
+                $sheet->mergeCells($A_T_S);
+
+                $A_S_S = 'A'.(string)$A_S;
+                $sheet->getStyle( $A_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+
+                $A_S = $row;
+                $A_T = $resul->projectId;
+            }
+            if($B_T != $resul->poiId){
+                $B_T_S = 'B'.(string)$B_S.':'.'B'.(string)($row-1);
+                $sheet->mergeCells($B_T_S);
+
+                $B_S_S = 'B'.(string)$B_S;
+                $sheet->getStyle( $B_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+
+
+                $B_S = $row;
+                $B_T = $resul->poiId;
+
+                $C_T_S = 'C'.(string)$C_S.':'.'C'.(string)($row-1);
+                $D_T_S = 'D'.(string)$C_S.':'.'D'.(string)($row-1);
+                $E_T_S = 'E'.(string)$C_S.':'.'E'.(string)($row-1);
+                $sheet->mergeCells($C_T_S);
+                $sheet->mergeCells($D_T_S);
+                $sheet->mergeCells($E_T_S);
+
+                $C_S_S = 'C'.(string)$C_S;
+                $D_S_S = 'D'.(string)$C_S;
+                $E_S_S = 'E'.(string)$C_S;
+
+                $sheet->getStyle( $C_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+                $sheet->getStyle( $D_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+                $sheet->getStyle( $E_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+
+
+                $C_S = $row;
+                $C_T = $resul->device_type;
+            }
+            if($C_T != $resul->device_type){
+                $C_T_S = 'C'.(string)$C_S.':'.'C'.(string)($row-1);
+                $D_T_S = 'D'.(string)$C_S.':'.'D'.(string)($row-1);
+                $E_T_S = 'E'.(string)$C_S.':'.'E'.(string)($row-1);
+                $sheet->mergeCells($C_T_S);
+                $sheet->mergeCells($D_T_S);
+                $sheet->mergeCells($E_T_S);
+
+                $C_S_S = 'C'.(string)$C_S;
+                $D_S_S = 'D'.(string)$C_S;
+                $E_S_S = 'E'.(string)$C_S;
+
+                $sheet->getStyle( $C_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+                $sheet->getStyle( $D_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+                $sheet->getStyle( $E_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+
+
+                $C_S = $row;
+                $C_T = $resul->device_type;
+            }
+
+            $row = $row + 1;
+        }
+        if($A_S<$row) {
+            $A_T_S = 'A' . (string)$A_S . ':' . 'A' . (string)($row - 1);
+            $sheet->mergeCells($A_T_S);
+        }
+
+        if($B_S<$row) {
+            $B_T_S = 'B' . (string)$B_S . ':' . 'B' . (string)($row - 1);
+            $sheet->mergeCells($B_T_S);
+        }
+
+        if($C_S<$row) {
+            $C_T_S = 'C' . (string)$C_S . ':' . 'C' . (string)($row - 1);
+            $D_T_S = 'D' . (string)$C_S . ':' . 'D' . (string)($row - 1);
+            $E_T_S = 'E' . (string)$C_S . ':' . 'E' . (string)($row - 1);
+            $sheet->mergeCells($C_T_S);
+            $sheet->mergeCells($D_T_S);
+            $sheet->mergeCells($E_T_S);
+        }
+
+        $A_S_S = 'A'.(string)$A_S;
+        $sheet->getStyle( $A_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $B_S_S = 'B'.(string)$B_S;
+        $sheet->getStyle( $B_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $C_S_S = 'C'.(string)$C_S;
+        $D_S_S = 'D'.(string)$C_S;
+        $E_S_S = 'E'.(string)$C_S;
+        $sheet->getStyle( $C_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getStyle( $D_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getStyle( $E_S_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+
+        $sheet->getColumnDimension('A')->setWidth(30);
+        $sheet->getColumnDimension('B')->setWidth(30);
+        $sheet->getColumnDimension('C')->setWidth(10);
+        $sheet->getColumnDimension('D')->setWidth(15);
+        $sheet->getColumnDimension('E')->setWidth(10);
+        $sheet->getColumnDimension('F')->setAutoSize(true);
+        $sheet->getColumnDimension('G')->setWidth(10);
+        $sheet->getColumnDimension('H')->setWidth(10);
+        $sheet->getColumnDimension('I')->setAutoSize(true);
+        $sheet->getColumnDimension('J')->setWidth(10);
+        $sheet->getColumnDimension('K')->setWidth(15);
+
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getStyle('B1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getStyle('C1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getStyle('D1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        $sheet->getStyle('E1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+
+        for($I = 1;$I <= $row;$I++){
+            $T_S = 'F'.$I;
+            $sheet->getStyle( $T_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+            $T_S = 'G'.$I;
+            $sheet->getStyle( $T_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+            $T_S = 'H'.$I;
+            $sheet->getStyle( $T_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+            $T_S = 'I'.$I;
+            $sheet->getStyle( $T_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+            $T_S = 'J'.$I;
+            $sheet->getStyle( $T_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+            $T_S = 'K'.$I;
+            $sheet->getStyle( $T_S)->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER)->setVertical(\PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_CENTER)->setWrapText(true);
+        }
+
+        $filename = $request->projectId.'-'.$project_name.'.xlsx';
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('file/' . $filename);
+
+        return response()->download('file/' . $filename, $filename, ['Access-Control-Allow-Origin' => '*', 'Access-Control-Expose-Headers' => 'Content-Disposition'])->deleteFileAfterSend(true);;
+
+
     }
 }
