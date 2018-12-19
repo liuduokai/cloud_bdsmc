@@ -4,11 +4,11 @@ namespace App;
 
 use Nicolaslopezj\Searchable\SearchableTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Registration extends Model
 {
-  use SoftDeletes;
+  // use SoftDeletes;
   use SearchableTrait;
 
     /**
@@ -16,11 +16,11 @@ class Registration extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    /*protected $dates = ['deleted_at'];
 
     protected $hidden = [
         'deleted_at',
-    ];
+    ];*/
     /**
      * Searchable rules.
      *

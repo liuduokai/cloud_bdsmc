@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AlarmsSensor;
 use http\Env\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 
 include_once 'addUserLog.php';
+include_once 'delFunction.php';
 
 class PoiController extends Controller
 {
@@ -77,6 +79,7 @@ class PoiController extends Controller
                 'deviceData2',
                 'acceptNBData',
                 'getSensorInfoByDeviceId',
+                'test1',
             ]]);
 
         DB::connection()->enableQueryLog();
@@ -1067,10 +1070,9 @@ class PoiController extends Controller
             'id' => 'required',
         ]);
 
-        $poi = Poi::findOrFail(intval($request->id));
-        $poi->delete();
-        addUserLog('delPoi2', $this->guard()->user()->id, 2);
-        return response()->json(['message' => 'del_ok']);
+        $result = _delPoi($request->id);
+        //addUserLog('delPoi2', $this->guard()->user()->id, 2);
+        return response()->json(['message' => 'delete_ok']);
     }
 
 
@@ -1206,15 +1208,8 @@ class PoiController extends Controller
         $this->validate($request, [
             'id' => 'required',
         ]);
-
-        $device = Device::findOrFail(intval($request->id));
-
-        $sensors = Sensor::where('device_id',$request->id)->get();
-        foreach ($sensors as $sensor){
-            $sensor->delete();
-        }
-        $device->delete();
-        //addUserLog('delDevice2', $this->guard()->user()->id, 2);
+        _delDevice($request->id);
+        addUserLog('delDevice2', $this->guard()->user()->id, 2);
         return response()->json(['message' => 'del_ok']);
     }
 
@@ -1329,8 +1324,8 @@ class PoiController extends Controller
             'id' => 'required',
         ]);
 
-        $sensor = Sensor::findOrFail(intval($request->id));
-        $sensor->delete();
+        _delSensor($request->id);
+
         addUserLog('delSensor2', $this->guard()->user()->id, 2);
         return response()->json(['message' => 'del_ok']);
     }
@@ -4145,6 +4140,41 @@ where
 
         return response()->download('file/' . $filename, $filename, ['Access-Control-Allow-Origin' => '*', 'Access-Control-Expose-Headers' => 'Content-Disposition'])->deleteFileAfterSend(true);;
 
+
+    }
+
+    public function test1(){
+        $devices = Device::findOrFail(intval(945));
+        $sensors = Sensor::where('device_id',intval(945))->get();
+        foreach ($sensors as $sensor){
+            $sensor->delete();
+        }
+        //return response()->json($poi);
+        $devices->delete();
+    }
+
+    public function _delSensor($id){
+
+        $alarms = Alarm::where('sensor_id',$id)
+            ->get();
+        foreach ($alarms as $alarm){
+            $alarm->delete();
+        }
+
+        $alarmsSensors = AlarmsSensor::where('sensor_id',$id)
+            ->get();
+        foreach ($alarmsSensors as $alarmsSensor){
+            $alarmsSensor>delete();
+        }
+
+        $displacementsensors = Displacementsensor1::where('device_id',$id)
+            ->get();
+        foreach ($displacementsensors as $displacementsensor){
+            $displacementsensor->delete();
+        }
+
+        $sensor = Sensor::findOrFail(intval($id));
+        $sensor->delete();
 
     }
 }

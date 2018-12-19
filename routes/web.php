@@ -408,3 +408,8 @@ $router->options('/getSensorInfoByDeviceId', ['middleware' => 'cors','uses' => '
 $router->post('/searchPoiReturnCorrectDevice', ['middleware' => 'cors','uses' => 'PoiController@searchPoiReturnCorrectDevice']);
 $router->get('/searchPoiReturnCorrectDevice', ['middleware' => 'cors','uses' => 'PoiController@searchPoiReturnCorrectDevice']);
 $router->options('/searchPoiReturnCorrectDevice', ['middleware' => 'cors','uses' => 'PoiController@searchPoiReturnCorrectDevice']);
+
+
+$router->post('/test1', ['middleware' => 'cors','uses' => 'PoiController@test1']);
+$router->get('/test1', ['middleware' => 'cors','uses' => 'PoiController@test1']);
+$router->options('/test1', ['middleware' => 'cors','uses' => 'PoiController@test1']);

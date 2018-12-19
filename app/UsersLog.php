@@ -4,10 +4,10 @@ namespace App;
 
 use Nicolaslopezj\Searchable\SearchableTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 class UsersLog extends Model
 {
-  use SoftDeletes;
+  // use SoftDeletes;
   use SearchableTrait;
     /**
      * The table associated with the model.
@@ -21,10 +21,10 @@ class UsersLog extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    /*protected $dates = ['deleted_at'];
     protected $hidden = [
         'deleted_at',
-    ];
+    ];*/
 
     public function users()
     {

@@ -3,11 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Photo extends Model
 {
-  use SoftDeletes;
+  // use SoftDeletes;
     /**
      * The table associated with the model.
      *
@@ -20,11 +20,11 @@ class Photo extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    /*protected $dates = ['deleted_at'];
 
     protected $hidden = [
         'deleted_at',
-    ];
+    ];*/
     /**
      * Searchable rules.
      *

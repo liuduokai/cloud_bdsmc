@@ -4,11 +4,11 @@ namespace App;
 
 use Nicolaslopezj\Searchable\SearchableTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AlarmsSensor extends Model
 {
-  use SoftDeletes;
+  // use SoftDeletes;
   use SearchableTrait;
     /**
      * The table associated with the model.
@@ -22,10 +22,10 @@ class AlarmsSensor extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    /*protected $dates = ['deleted_at'];
     protected $hidden = [
         'deleted_at',
-    ];
+    ];*/
 
     /**
      * Searchable rules.

@@ -10,11 +10,11 @@ namespace App;
 
 use Nicolaslopezj\Searchable\SearchableTrait;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class QianXun extends Model
 {
-    use SoftDeletes;
+    //use SoftDeletes;
     use SearchableTrait;
     protected $table = 'qianxun';
 }

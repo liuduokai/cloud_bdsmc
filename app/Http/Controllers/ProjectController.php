@@ -7,7 +7,9 @@ use Illuminate\Http\Request;
 use App\Project;
 use Illuminate\Support\Facades\Auth;
 use App\QianXun;
-include_once 'addUserLog.php';
+
+
+include_once 'delFunction.php';
 
 class ProjectController extends Controller
 {
@@ -20,6 +22,7 @@ class ProjectController extends Controller
     {
         $this->middleware('auth:api',
             ['except' => [
+                'delProject2',
             ]]);
 
         DB::connection()->enableQueryLog();
@@ -138,10 +141,9 @@ class ProjectController extends Controller
       $this->validate($request, [
           'id' => 'required|exists:projects',
       ]);
-
-      $user = Project::find(intval($request->id));
-      $user->delete();
-      addUserLog('delProject2',$this->guard()->user()->id,2);
+      $result = _delProject($request->id);
+      return response()->json($result);
+      //addUserLog('delProject2',$this->guard()->user()->id,2);
       return response()->json(['message' => 'del_ok']);
     }
 
