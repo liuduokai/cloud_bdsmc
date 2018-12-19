@@ -10,7 +10,6 @@ use App\Project;
 use App\Sensor;
 use App\Poi;
 
-include_once 'delFunction.php';
 
 /**
  * Created by PhpStorm.

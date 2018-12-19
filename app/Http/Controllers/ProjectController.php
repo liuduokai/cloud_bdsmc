@@ -7,8 +7,7 @@ use Illuminate\Http\Request;
 use App\Project;
 use Illuminate\Support\Facades\Auth;
 use App\QianXun;
-
-
+include_once 'addUserLog.php';
 include_once 'delFunction.php';
 
 class ProjectController extends Controller
@@ -141,9 +140,7 @@ class ProjectController extends Controller
       $this->validate($request, [
           'id' => 'required|exists:projects',
       ]);
-      $result = _delProject($request->id);
-      return response()->json($result);
-      //addUserLog('delProject2',$this->guard()->user()->id,2);
+      _delProject($request->id);;
       return response()->json(['message' => 'del_ok']);
     }
 
