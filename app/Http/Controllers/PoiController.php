@@ -179,6 +179,7 @@ class PoiController extends Controller
             $alarm->content = $alarmContent;
             $alarm->type = $alarmType;
             $alarm->sensor_id = $sensor->id;
+            $alarm->time = $request->time;
             $alarm->save();
             addUserLog('pick', $this->guard()->user()->id, 1);
             $pwdObj->content = $alarm->content;
@@ -438,28 +439,28 @@ class PoiController extends Controller
             ->select(DB::raw("sensors.*,
                 (
 	            case name
-                when name = '偏东' then 1
-		        when name = '偏北' then 2
-		        when name = '高程变化' then 3
-		        when name = '经度' then 4
-		        when name = '纬度' then 5
-		        when name = '海拔' then 6
-		        when name = '小时雨量' then 7
-		        when name = '当天雨量' then 8
-		        when name = '裂缝' then 9
-		        when name = '裂缝值' then 10
-		        when name = '湿度' then 11
-		        when name = '温度' then 12
-		        when name = '30cm含水量' then 13
-		        when name = '30cm温度' then 14
-		        when name = '60cm含水量' then 15
-		        when name = '60cm温度' then 16
-		        when name = '90cm含水量' then 17
-		        when name = '90cm温度' then 18
-		        when name = '方位角x' then 19
-		        when name = '方位角' then 20
-		        when name = '俯仰角y' then 21
-		        when name = '横滚角z' then 22
+                when '偏东' then 1
+		        when '偏北' then 2
+		        when '高程变化' then 3
+		        when '经度' then 4
+		        when '纬度' then 5
+		        when '海拔' then 6
+		        when '小时雨量' then 7
+		        when '当天雨量' then 8
+		        when '裂缝' then 9
+		        when '裂缝值' then 10
+		        when '湿度' then 11
+		        when '温度' then 12
+		        when '30cm含水量' then 13
+		        when '30cm温度' then 14
+		        when '60cm含水量' then 15
+		        when '60cm温度' then 16
+		        when '90cm含水量' then 17
+		        when '90cm温度' then 18
+		        when '方位角x' then 19
+		        when '方位角' then 20
+		        when '俯仰角y' then 21
+		        when '横滚角z' then 22
 		        ELSE 23
 	            END
                 ) seq"))
