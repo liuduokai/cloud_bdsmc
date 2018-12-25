@@ -439,9 +439,9 @@ class PoiController extends Controller
             ->select(DB::raw("sensors.*,
                 (
 	            case name
-                when '偏东' then 1
+                when '高程变化' then 1
 		        when '偏北' then 2
-		        when '高程变化' then 3
+		        when '偏东' then 3
 		        when '经度' then 4
 		        when '纬度' then 5
 		        when '海拔' then 6
