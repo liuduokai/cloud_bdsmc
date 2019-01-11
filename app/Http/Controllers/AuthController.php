@@ -24,11 +24,6 @@ include_once 'addUserLog.php';
 
 class AuthController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth:api',
@@ -65,14 +60,6 @@ class AuthController extends Controller
     }
 	 public function addUserList(Request $request)                     //从文件中增加用户列表
     {
-      /*
-      $messages = [
-          'file.mimetypes' => '文件类型必须为：xls,xlsx',
-      ];
-      $this->validate($request, [
-          'file' => 'mimes:xls,xlsx',
-      ]);
-      */
       $messages = [
           'email.required' => '请填写用户名',
           'email.unique' => '用户名已经存在',
@@ -194,25 +181,14 @@ class AuthController extends Controller
           'phone.numeric' => '手机号码必须是数字',
           'phone.digits' => '手机号码必须是:digits位',
           'phone.unique' => '手机号码已经存在',
-          //'password.required' => '请填写密码',
       ];
       $this->validate($request, [
         'id' => 'required|numeric|exists:users',
       ],$messages);
       $this->validate($request, [
-          //'id' => 'required|numeric|exists:users',
           'name' => 'required|unique:users,name,'.$request->id.',,deleted_at,NULL',
-
-          // 'name' => ['required',
-          // //'unique:users,name,,,deleted_at,NULL',
-          //     Rule::unique('users')->ignore($request->id)->where(function ($query) {
-          //       return $query->where('deleted_at', NULL);
-          //   })],
-
           'email' => 'required|unique:users,email,'.$request->id.',,deleted_at,NULL',
           'phone' => 'required|numeric|digits:11|unique:users,phone,'.$request->id.',,deleted_at,NULL',
-
-          //'project_id' => 'required',
       ],$messages);
 
 
@@ -240,11 +216,6 @@ class AuthController extends Controller
       addUserLog('updateUser',$this->guard()->user()->id,3);
       return response()->json(['message' => 'update_ok']);
     }
-
-
-    //2
-
-
 
     public function listUsers2(Request $request)
     {
@@ -380,13 +351,6 @@ class AuthController extends Controller
       
     }
 
-    /**
-     * Get a JWT token via given credentials.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login(Request $request)
     {
       $messages = [
@@ -414,10 +378,8 @@ class AuthController extends Controller
         }
       }else{
         return response()->json(['error' => '输入密码错误次数过多',  $request->email,'wrong'=>Cache::get($request->email),'ip'=>$ip], 403);
-       // return response()->json(['error' => 'Unauthorized','email' => $request->email,'ip'=>$ip], 401);
       }
          $ip = $request->getClientIp();
-        //echo $ip; */
         return response()->json(['error' => '请输入正确的用户名和密码','email' => $request->email,'ip'=>$ip], 401);
     }
 
@@ -456,27 +418,16 @@ class AuthController extends Controller
             }
         }else{
             return response()->json(['error' => '输入密码错误次数过多',  $request->email,'wrong'=>Cache::get($request->email),'ip'=>$ip], 403);
-            // return response()->json(['error' => 'Unauthorized','email' => $request->email,'ip'=>$ip], 401);
         }
         $ip = $request->getClientIp();
-        //echo $ip; */
         return response()->json(['error' => '请输入正确的用户名和密码','email' => $request->email,'ip'=>$ip], 401);
     }
-    /**
-     * Get the authenticated User
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
+
     public function me()
     {
         return response()->json($this->guard()->user());
     }
 
-    /**
-     * Log the user out (Invalidate the token)
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout()
     {
         $this->guard()->logout();
@@ -484,23 +435,11 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    /**
-     * Refresh a token.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function refresh()
     {
         return $this->respondWithToken($this->guard()->refresh());
     }
 
-    /**
-     * Get the token array structure.
-     *
-     * @param  string $token
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
     protected function respondWithToken($token)
     {
         $this->guard()->user()->project;
@@ -512,11 +451,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * Get the guard to be used during authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Guard
-     */
     public function guard()
     {
         return Auth::guard();
@@ -524,33 +458,19 @@ class AuthController extends Controller
 
 	public function updateMe(Request $request)
     {
-  		//$this->guard()->user()->name = '123456';
-  		//$this->guard()->user()->save();
-
   		$user = $this->guard()->user();
-      //var_dump($request->input());
       if($request->has('name'))
         $user->name = $request->input('name');
       if($request->has('phone'))
         $user->phone = $request->input('phone');
       if($request->has('gender'))
         $user->gender = $request->input('gender');
-      /*if($request->has('project_name'))
-        $user->project_name = $request->input('project_name');*/
       if($request->has('home'))
         $user->home = $request->input('home');
       if($request->has('id_number'))
         $user->id_number = $request->input('id_number');
-          //$attributes = array_filter($request->input());
-
       $user->save();
       addUserLog('updateMe',$this->guard()->user()->id,3);
-        // if ($attributes) {
-        //     $user->update(['phone' => '13330243024']);
-        // }
-
-
-
         return response()->json(['message' => 'update_ok']);
     }
 
@@ -590,15 +510,11 @@ class AuthController extends Controller
         return response()->json(["phone"=>"管理员不能使用短信验证码登录"],200);
 
       $pwd = strval(rand(0,9)).strval(rand(0,9)).strval(rand(0,9)).strval(rand(0,9));
-      //$pwd = "0780";
       Cache::put('pwd_'.$request->phone, $pwd, 3);
       $pwdObj = (object)null;
-      //$pwdObj->type = 1;
       $pwdObj->phone = $request->phone;
       $pwdObj->pwd = $pwd;
-      //event(new SmsEvent($pwdObj));
       $this->amqpsms($pwdObj);
-      //dispatch(new MsgJob);
       return response()->json(['message'=>'send it']);
     }
     
@@ -611,18 +527,12 @@ class AuthController extends Controller
         $vhost = config("auth.authAmqpVhost");
         $connection = new AMQPStreamConnection($host, $port, $user, $password, $vhost);
         $channel = $connection->channel();
-
-        //$channel->exchange_declare('topic_logs', 'topic', false, false, false);
-
         $routing_key = 'sms';
         $data = json_encode($pwdObj);
 
         $msg = new AMQPMessage($data);
 
         $channel->basic_publish($msg, 'amq.topic', $routing_key);
-
-        //echo " [x] Sent ",$routing_key,':',$data," \n";
-
         $channel->close();
         $connection->close();
         
@@ -683,7 +593,6 @@ class AuthController extends Controller
               
             $sensors = $device->sensors;
               foreach ($sensors as $sensor) {
-                //$alarms_tmp = $sensor->alarms()->where('state',0)->orderBy('time', 'desc')->get();
                 $count_tmp = $sensor->alarms()->where('state',0)->count();
                 $alarmCount = $alarmCount + $count_tmp;
               }
@@ -730,16 +639,7 @@ class AuthController extends Controller
       $t=time();
       $sign =  strtoupper(md5($epid.$uid.$psw.$t));
       $Authorization  = base64_encode($epid."_".$uid."_".$t);
-      /*
-      echo "请求参数：".$req;
-      echo "</br>";
-      echo "sign：".$sign;
-      echo "</br>";
-      echo "Authorization：".$Authorization;
-      echo "</br>";
-      */
         $url = "http://218.76.43.93:9580/nmc/rest/realstream?sign=".$sign;
-        //$url = "http://192.168.1.140:9580/nmc/rest/realstream?sign=".$sign;
         $header = array(
             'Accept:' . 'Accept:application/json',
             'Content-Type:Accept:application/json;charset=utf-8',
@@ -754,9 +654,6 @@ class AuthController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $result = curl_exec($ch);
         curl_close($ch);
-        
-
-        //echo urldecode($result);
         return response(urldecode($result));
     }
 
@@ -779,36 +676,20 @@ class AuthController extends Controller
           "userId"=>"admin"
         
       ];
-      //$req = json_encode($req);
-      //echo $req;
-      //var_dump($req);
       $url = "http://218.76.43.93:9580/nmc/rest/v1/pu/query";
 
         $header = array(
             'Accept:' . 'Accept:application/json',
             'Content-Type:Accept:application/json;charset=utf-8',
-            //'Authorization:' .$Authorization 
         );
         $ch = curl_init($url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        //curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
         curl_setopt($ch,CURLOPT_POST,1);
         curl_setopt($ch,CURLOPT_POSTFIELDS,$req);
-        /*curl_setopt($ch,CURLOPT_POSTFIELDS,["page"=>1,
-          "rows"=>100,
-          "epid"=>"system",
-          "userId"=>"admin"]);*/
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        //curl_setopt($ch, CURLINFO_HEADER_OUT, true);
         $result = curl_exec($ch);
-        //$info = curl_getinfo($ch);
-        //var_dump($info);
-        
         curl_close($ch);
-        
-
-        //echo urldecode($result);
         return response(urldecode($result));
 
     }
@@ -835,7 +716,6 @@ class AuthController extends Controller
           "videoformat"=>"hls",
           "begin"=>$request->begin,
           "end"=>$request->end,
-          //"stream"=>"1",
           "expiretimes"=>"86400"
         )
       );
@@ -848,14 +728,6 @@ class AuthController extends Controller
       $t=time();
       $sign =  strtoupper(md5($epid.$uid.$psw.$t));
       $Authorization  = base64_encode($epid."_".$uid."_".$t);
-      /*
-      echo "请求参数：".$req;
-      echo "</br>";
-      echo "sign：".$sign;
-      echo "</br>";
-      echo "Authorization：".$Authorization;
-      echo "</br>";
-      */
       $url = "http://218.76.43.93:9580/nmc/rest/vodstream?sign=".$sign;
 
         $header = array(
@@ -872,12 +744,9 @@ class AuthController extends Controller
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         $result = curl_exec($ch);
         curl_close($ch);
-        
-
-        //echo urldecode($result);
         return response(urldecode($result));
     }
-    public function addUserLog(Request $request /* $action,$id,$type */){
+    public function addUserLog(Request $request){
         $this->validate($request, [
             'action' => 'required',
             'id' => 'required',
@@ -894,8 +763,6 @@ class AuthController extends Controller
     }
     public function UsersLog(Request $request){
       if($this->guard()->user()->type == 1){
-       /*  $userlogdate = UsersLog::all();
-        $userInfo  = UsersLog::all()->users; */
         $userlogdate = DB::table('usersLog')
         ->join('users', 'usersLog.user_id', '=', 'users.id')
         ->select(
@@ -919,7 +786,6 @@ class AuthController extends Controller
             'password.required' => '请填写密码',
         ];
         $numb =
-        //Cache::put('pwd_'.$request->phone, "1234", 3);
         $this->validate($request, [
             'phone' => 'required|numeric|digits:11',
             'code' => 'required|numeric|digits:4',
@@ -933,9 +799,6 @@ class AuthController extends Controller
                 $user = DB::table('users')
                     ->where('phone', $request->phone)
                     ->update(['password'=>(app('hash')->make($request->password))]);
-                //$user->password = app('hash')->make($request->password);
-                //$user->name = "llltest";
-                //$user->save();
                 return response()->json(['message'=>'修改密码成功']);
             }else {
                 return response()->json(['error'=>'验证码错误'],403);

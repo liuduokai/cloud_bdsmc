@@ -18,11 +18,6 @@ use App\Maintenance;
 include_once 'addUserLog.php';
 class AlarmController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth:api', ['except' => [
@@ -33,12 +28,6 @@ class AlarmController extends Controller
 
         DB::connection()->enableQueryLog();
     }
-
-    /**
-     * Get the guard to be used during authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Guard
-     */
     public function guard()
     {
         return Auth::guard();
@@ -350,7 +339,6 @@ class AlarmController extends Controller
             $sql_part_project = ['pois.project_id', '=', $project_id];
             array_push($sql_where, $sql_part_project);
         }
-        //return response()->json($project_id);
         $result = DB::table('alarmsCamera')
             ->join('cameras', 'cameras.id', '=', 'alarmsCamera.camera_id')
             ->join('pois', 'pois.id', '=', 'cameras.poi_id')
@@ -391,9 +379,6 @@ class AlarmController extends Controller
       return Alarm::findOrFail($id);
     }
 
-
-    //registrations
-    //
     public function addReg(Request $request)
     {
         $this->validate($request, [
@@ -423,8 +408,6 @@ class AlarmController extends Controller
       return response()->json($regs);
     }
 
-    //Maintenances
-    //
     public function listMaintenances(Request $request)
     {
       if($request->has('id'))

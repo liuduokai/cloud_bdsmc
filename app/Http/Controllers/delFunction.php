@@ -10,13 +10,6 @@ use App\Project;
 use App\Sensor;
 use App\Poi;
 
-
-/**
- * Created by PhpStorm.
- * User: pc
- * Date: 2018/12/18
- * Time: 15:38
- */
 function _delSensor($id){
     $alarms = Alarm::where('sensor_id',$id)
         ->get();

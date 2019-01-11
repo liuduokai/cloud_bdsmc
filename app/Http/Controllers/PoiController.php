@@ -40,11 +40,6 @@ include_once 'delFunction.php';
 
 class PoiController extends Controller
 {
-    /**
-     * Create a new AuthController instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('auth:api',
@@ -84,12 +79,6 @@ class PoiController extends Controller
 
         DB::connection()->enableQueryLog();
     }
-
-    /**
-     * Get the guard to be used during authentication.
-     *
-     * @return \Illuminate\Contracts\Auth\Guard
-     */
     public function guard()
     {
         return Auth::guard();
@@ -252,7 +241,6 @@ class PoiController extends Controller
                 $poi["photos"] = $noNull;
             }
             $poi["devices2"] = $poi->devices;
-            //return response()->json([$poi]);
         }
 
         return response()->json($pois);
@@ -296,7 +284,6 @@ class PoiController extends Controller
             return response()->json(['error' => '未经授权的操作'], 401);
 
         $this->validate($request, [
-            //'id' => 'required|numeric',
             'poiId' => 'required|numeric',
         ]);
 
@@ -323,7 +310,6 @@ class PoiController extends Controller
         $count = 1;
         if(isset($poiss)) {
             foreach ($poiss as $poi) {
-                //return response()->json(['type'=>gettype($poi),'project_id'=>$poi->project_id,'poi_name'=>$poi->name]);
                 if ($poi->project_id === $project_id || $this->guard()->user()->type === 1) { //权限控制，测试版本暂时不加入相应功能
                     $poi_name = $poi->name;
 
@@ -335,17 +321,13 @@ class PoiController extends Controller
                     $poi["photos"] = $photos;
                     $poi["devices2"] = $poi->devices;
                     $pois_id[] = $poi;
-                    //$count++;
                 }
             }
         }
 
         //根据监测点名搜索
         if ($this->guard()->user()->type == 1)
-            //$pois = Poi::where('project_id', $this->guard()->user()->project_id)->get();
-
             $pois_name = Poi::search(urldecode($q))
-                //->where
                 ->get();
         else {
             $pois_name = Poi::search(urldecode($q))
@@ -365,12 +347,6 @@ class PoiController extends Controller
 
             $poi["photos"] = $photos;
             $poi["devices2"] = $poi->devices;
-
-            //$poi["photos"] = Photo::where('poi_id',$poi->id)->get();
-            //$poi["photos"] = \App\Photo::all();
-            //$queries    = DB::getQueryLog();
-            //$last_query = end($queries);
-            //dd($last_query);
         }
 
         if (isset($pois_id))
@@ -393,9 +369,6 @@ class PoiController extends Controller
         }
 
         $devices = Device::where('poi_id', $request->id)->get();
-        //$devices  =Device::all();
-        //$count = Device::where([['poi_id', $request->id],['type','<>',6]])->count();
-        //$returns =['devices' =>$devices];
         return response()->json($devices);
     }
 
@@ -475,8 +448,6 @@ class PoiController extends Controller
 
     function isDatetime($param = '', $format = 'Y-m-d H:i:s')
     {
-        //2017-06-7  =>  not ok
-        //2017-06-07  =>  ok
         return date($format, strtotime($param)) === $param;
     }
 
@@ -553,12 +524,6 @@ class PoiController extends Controller
     {
         ini_set('memory_limit','2048M');
         $projectId = $this->guard()->user()->project_id;
-
-        //if($projectId)
-        {
-            //$insars = Insar::all();
-            //return response()->json($insars);
-        }
         if ($this->guard()->user()->type == 3) {
             $colors = DB::table('insar')
                 ->select('color')
@@ -607,9 +572,6 @@ class PoiController extends Controller
         ]);
 
         $insar = Insar::findOrFail($request->id);
-        //$projectId = $this->guard()->user()->project_id;
-
-        //if($projectId)
         {
             $insar->data = InsarData::where("insar_id", $request->id)->get();
             return response()->json($insar);
@@ -985,8 +947,6 @@ class PoiController extends Controller
 
     }
 
-
-    //for bdmc
     public function listPois2(Request $request)
     {
         $this->validate($request, [
@@ -1013,7 +973,6 @@ class PoiController extends Controller
             'name' => 'required',
             'location' => 'required',
             'project_id' => 'required',
-            //'id2' => 'required|numeric|unique:pois,id2,,,deleted_at,NULL',
         ]);
 
         $poi = new Poi;
@@ -1021,8 +980,6 @@ class PoiController extends Controller
         $poi->project_id = $request->project_id;
         $poi->name = $request->name;
         $poi->location = $request->location;
-        //$poi->id2 = $request->id2;
-
         if ($request->has('user_id'))
             $poi->user_id = $request->input('user_id');
         if ($request->has('lng'))
@@ -1045,8 +1002,6 @@ class PoiController extends Controller
         ]);
 
         $poi = Poi::findOrFail(intval($request->id));
-        /*if ($request->has('id2'))
-            $poi->id2 = $request->input('id2');*/
         if ($request->has('name'))
             $poi->name = $request->input('name');
         if ($request->has('user_id'))
@@ -1072,7 +1027,6 @@ class PoiController extends Controller
         ]);
 
         $result = _delPoi($request->id);
-        //addUserLog('delPoi2', $this->guard()->user()->id, 2);
         return response()->json(['message' => 'delete_ok']);
     }
 
@@ -1084,9 +1038,6 @@ class PoiController extends Controller
         ]);
 
         $devices = Device::where('poi_id', intval($request->id))->get();
-        // $queries    = DB::getQueryLog();
-        // $last_query = end($queries);
-        // dd($last_query);
         return response()->json($devices);
     }
 
@@ -1097,14 +1048,6 @@ class PoiController extends Controller
             'name' => 'required',
             'id2' => 'required|numeric|unique:devices,id2,,,deleted_at,NULL',
         ]);
-
-
-        /*$id2 = $request->id2;
-        $result = DB::table('devices')
-            ->where("devices.id2", $id2)
-            ->exists();
-        if (!$result) {*/
-
 
         $id2 = $request->id2;
         $result = DB::table('devices')
@@ -1166,15 +1109,7 @@ class PoiController extends Controller
                 break;
         }
 
-        //addUserLog('addDevice2', $this->guard()->user()->id, 1);
-
-
-
-        //return response()->json(gettype($device_type));
-
         return response()->json(['message' => 'add_ok','id'=>$device_id]);
-
-
     }
 
     public function updateDevice2(Request $request)
@@ -1214,7 +1149,6 @@ class PoiController extends Controller
         return response()->json(['message' => 'del_ok']);
     }
 
-    //sensor
     public function listSensors2(Request $request)
     {
         $this->validate($request, [
@@ -1222,16 +1156,6 @@ class PoiController extends Controller
         ]);
 
         $sensors = Sensor::where([['device_id', intval($request->id)],['deleted_at', '=', NULL],])->get();
-        // $queries    = DB::getQueryLog();
-        // $last_query = end($queries);
-        // dd($last_query);
-
-        // $sensors = json_decode(json_encode($sensors), true);
-        /* foreach ($sensors as $sensor) {
-           $sensor->id2 = (string)$sensor->id2;
-       } */
-        // $id2  =strval($sensors->id2);
-        //$sensors->id2 = (string)$id2;
         return response()->json($sensors);
     }
 
@@ -1255,11 +1179,6 @@ class PoiController extends Controller
         } else {
             return response()->json(['error' => '该id已经存在，无法继续添加']);
         }
-        /* $id2 = $request->id2;
-         $result = DB::table('sensors')
-             ->where("sensors.id2", $id2)
-             ->exists();
-         if(!$result) {*/
         $sensor = new Sensor;
         $sensor->device_id = $request->device_id;
         $sensor->name = $request->name;
@@ -1280,12 +1199,7 @@ class PoiController extends Controller
             $sensor->value = $request->value;
 
         $sensor->save();
-        //addUserLog('addSensor2', $this->guard()->user()->id, 1);
         return response()->json(['message' => 'add_ok']);
-        /*}else{
-            return response()->json(['error' => '该id已经存在，无法继续添加']);
-        }*/
-
     }
 
     public function updateSensor2(Request $request)
@@ -1331,16 +1245,6 @@ class PoiController extends Controller
         return response()->json(['message' => 'del_ok']);
     }
 
-    // public function poiFromSensor(Request $request)
-    // {
-    //   $this->validate($request, [
-    //       'sensor_id' => 'required',
-    //   ]);
-    //
-    //   $poi = Sensor::find($request->sensor_id)
-    //
-    //   return response()->json(['message' => 'del_ok']);
-    // }
     public function addPos(Request $request)
     {
         $this->validate($request, [
@@ -1396,7 +1300,6 @@ class PoiController extends Controller
             $photo->save();
             addUserLog('addImagePath', $this->guard()->user()->id, 1);
             return response()->json($photo);
-            //return response()->json(['message' => 'error']);
         } elseif ($request->hasFile('info_image') && $request->file('info_image')->isValid()) {
 
             $infofilename = uniqid() . "_" . $request->file('info_image')->getClientOriginalName();
@@ -1429,8 +1332,6 @@ class PoiController extends Controller
                 ->whereNotNull('path')
                 ->select('id', 'path')
                 ->get();
-            // $result = Photo::all();
-
         } else {
             $result = Photo::where('poi_id', $id)
                 ->whereNotNull('info_path')
@@ -1578,8 +1479,6 @@ class PoiController extends Controller
         }
         if(!isset($pid))
              return json_encode((object)null);
-        //$device_id_1t= gettype($device_id_1);
-        //$device_id_1= $device_id_1["project_id"];
         if (Cache::has($request->email)) {
         } else {
             Cache::put($request->email, 1, 5);
@@ -1607,22 +1506,6 @@ class PoiController extends Controller
                         ->groupby('displacementsensor1.gps_time','displacementsensor1.device_id')
                         ->orderBy('displacementsensor1.gps_time','asc')
                         ->get();
-                    /*$result=[];
-                    $temp=[];
-                    $temp_num = 0;
-                    foreach ($alarms as $alarm){
-                       if($alarm->device_id>$temp_num){
-                           $temp_num = $alarm->device_id;
-                           $tempdata = $alarm;
-                           $temp[]=$tempdata;
-                       } else{
-                           $temp_num = $alarm->device_id;
-                           $result []= $temp;
-                           $temp=[];
-                           $tempdata = $alarm;
-                           $temp[]=$tempdata;
-                       }
-                    }*/
                     $temp_time = null;
                     foreach ($alarms as $alarm){
                        $result[$alarm->gps_time][]=$alarm;
@@ -1639,9 +1522,7 @@ class PoiController extends Controller
             }
         } else {
             return response()->json(['error' => '输入密码错误次数过多', $request->email, 'wrong' => Cache::get($request->email), 'ip' => $ip], 403);
-            // return response()->json(['error' => 'Unauthorized','email' => $request->email,'ip'=>$ip], 401);
         }
-        //echo $ip; */
         return response()->json(['error' => '请输入正确的用户名和密码', 'email' => $request->email, 'ip' => $ip], 401);
     }
 
@@ -1787,9 +1668,6 @@ class PoiController extends Controller
     }
 
     public function testDeviceData(Request $request){
-
-        //$empty_object = (object)array();
-
         $ip = $request->getClientIp();
 
 
@@ -1880,8 +1758,6 @@ class PoiController extends Controller
                             ->select('pois.project_id')
                             ->where('cameras.uid', '=', $file)
                             ->get();
-                        //return response()->json([''=>$project,''=>$file]);
-
                         foreach ($project as $item){
                             $cam_pro_id = $item->project_id;
                         }
@@ -1893,7 +1769,6 @@ class PoiController extends Controller
                     }
                 }
             }
-            //return response()->json($cam_pro_id);
             if(isset($dev_ids)) {
                 foreach ($dev_ids as $dev_id) {
                     $dev_path = $root_dir . $dev_id . '/00/';
@@ -1997,9 +1872,6 @@ class PoiController extends Controller
         $vhost = config("auth.authAmqpVhost");
         $connection = new AMQPStreamConnection($host, $port, $user, $password, $vhost);
         $channel = $connection->channel();
-
-        //$channel->exchange_declare('topic_logs', 'topic', false, false, false);
-
         $routing_key = 'annte';
         $data = $request->getContent();
         $data = json_encode($data);
@@ -2039,11 +1911,6 @@ class PoiController extends Controller
 
             $device->save();
         }
-        //$poi_id = $device_datas->poi_id;
-
-        /*$device_id=base_convert($device_id,16,10);
-        $device_id = $device_id*65536;*/
-
         return response()->json(["message"=>'add_success']);
     }
 
@@ -3023,7 +2890,6 @@ where
     A.deleted_at is NULL 
     and B.deleted_at is NULL
     and A.id = ?',[$request->deviceId]);
-        //return response()->json($sensor_count[0]->count);
         $offset = $sensor_count[0]->count*($request->pageNumber-1)*$request->pageSize;
         $take = $sensor_count[0]->count*$request->pageSize;
 
@@ -3076,8 +2942,6 @@ limit  ?,? ',
                 ['devices.deleted_at', '=', NULL]
             ])
             ->count();
-
-        //return $sensors_count;
         $sensors = DB::table('sensors')
             ->join('devices', 'devices.id', '=', 'sensors.device_id')
             ->select('sensors.name','sensors.id')
@@ -3093,11 +2957,7 @@ limit  ?,? ',
         foreach ($sensors as $sensor){
             $sensorsIdArrays[] =$sensor->id;
         }
-        //return $sensorsIdArrays;
         $sensorsArray[] = '时间';
-        //return response()->json($sensorsArray);
-        //return $sensorsArray;
-
         $sql_where = array();
         $sql_part_project_id = ['devices.id', '=', $device_id];
         $sql_part_project_not_null = ['devices.deleted_at', '=', NULL];
@@ -3144,11 +3004,6 @@ limit  ?,? ',
             $result = json_encode((object)null);
         }
 
-        /*foreach ($result as $key => $value){
-            $value[] = $key;
-            $results[] = $value;
-        }*/
-
         foreach ($result as $resulKey=>$resulValue){
             foreach ($sensorsIdArrays as $sensorsIdArray){
                 $tempIdToDatas[$sensorsIdArray] = NULL;
@@ -3164,7 +3019,6 @@ limit  ?,? ',
             unset($result_final_part);
         }
 
-        //$result = get_object_vars($result);
         return response()->json(['sensorsArray' =>$sensorsArray, 'data' => $result_final_full]);
     }
 
@@ -3185,41 +3039,6 @@ limit  ?,? ',
         }else{
             return response()->json("参数错误");
         }
-
-        /*if($request->has(poiId)) {
-            $devices = Device::search($keyWord)
-                ->where('devices.deleted_at', '=', NULL)
-                ->get();
-            foreach ($devices as $device) {
-                if ($device->poi != null)
-                    $poiss[$device->poi->id] = $device->poi;
-            }
-
-            if (isset($poiss)) {
-                foreach ($poiss as $poi) {
-
-                    $poi_name = $poi->name;
-                    $poi["pinyin"] = $pinyin->convert($poi_name)[0][0];
-                    $poi["devices"] = Device::search($keyWord)
-                        ->where([['devices.deleted_at', '=', NULL], ['devices.poi_id', '=', $poi->id]])
-                        ->get();
-                    $pois_id[] = $poi;
-                }
-            }
-        }
-        $pois_name = Poi::search(urldecode($q))
-            ->get();
-
-        foreach ($pois_name as $poi) {
-            $poi["pinyin"] = $pinyin->convert($poi->name)[0][0];
-            $poi["devices"] = $poi->devices;
-        }
-
-        if (isset($pois_id))
-            $pois = $pois_id;
-        else
-            $pois = $pois_name;
-        return response()->json($pois);*/
     }
 
 
