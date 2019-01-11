@@ -2117,6 +2117,8 @@ class PoiController extends Controller
 
             return response()->json(Device_test::where('device_hex_id',$request->device_hex_id)->get());
 
+        }elseif($request->has('keyword')){
+            return response()->json( Device::search($request->keyword)->get());
         }else{
 
             return response()->json(Device_test::all());
