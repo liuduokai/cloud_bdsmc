@@ -3049,6 +3049,19 @@ limit  ?,? ',
     }
 
     public function getTotalDataCount(Request $request){
+
+        if($request->has('id')){
+            $new_final_ids = DB::table('displacementsensor1')
+                    ->select('displacementsensor1.id')
+                    ->orderBy('id', 'desc')
+                    ->limit(1)
+                    ->get();
+            foreach($new_final_ids as $new_final_id){
+                $new_end_id = $new_final_id->id;
+            }
+            $add = $new_end_id - $request->id;
+            return response()->json(['id'=>$new_end_id,'add'=>$add]);
+        }
         
         $today_time_stamp = time();
         $today = getdate($today_time_stamp);
@@ -3058,26 +3071,24 @@ limit  ?,? ',
 
         $start = date_create($today_year.'-'.$today_mon.'-'.$today_day.' '.'00:00:00');
         $end = date_create($today_year.'-'.$today_mon.'-'.$today_day.' '.'23:59:59');
-        // $start = date_create('1970-01-01 00:00:00');
 
         $count_total = DB::table('displacementsensor1')
-                    ->join('sensors', 'sensors.id', '=', 'displacementsensor1.device_id')
-                    ->join('devices', 'devices.id', '=', 'sensors.device_id')
-                    ->join('pois', 'pois.id', '=', 'devices.poi_id')
-                    ->join('projects', 'projects.id', '=', 'pois.project_id')
-                    ->where('projects.id', '=', '12')
                     ->count();
-
+        
         $count_today = DB::table('displacementsensor1')
-                    ->join('sensors', 'sensors.id', '=', 'displacementsensor1.device_id')
-                    ->join('devices', 'devices.id', '=', 'sensors.device_id')
-                    ->join('pois', 'pois.id', '=', 'devices.poi_id')
-                    ->join('projects', 'projects.id', '=', 'pois.project_id')
-                    ->where([['projects.id', '=', '12'],
-                            ['displacementsensor1.gps_time', '>', $start],
+                    ->where([['displacementsensor1.gps_time', '>', $start],
                             ['displacementsensor1.gps_time', '<', $end]])
                     ->count();
-        return response()->json(['total'=>$count_total, 'today'=>$count_today]);
+
+        $final_ids = DB::table('displacementsensor1')
+                    ->select('displacementsensor1.id')
+                    ->orderBy('id', 'desc')
+                    ->limit(1)
+                    ->get();
+        foreach($final_ids as $final_id){
+            $end_id = $final_id->id;
+        }
+        return response()->json(['total'=>$count_total, 'today'=>$count_today, 'id'=>$end_id]);
     }
 
     public function getDeviceOnlineCount(){
