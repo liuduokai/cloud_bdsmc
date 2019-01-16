@@ -74,6 +74,8 @@ class PoiController extends Controller
                 'deviceData2',
                 'acceptNBData',
                 'getSensorInfoByDeviceId',
+                'getTotalDataCount',
+                'getDeviceOnlineCount',
                 'test1',
             ]]);
 
@@ -367,7 +369,6 @@ class PoiController extends Controller
             if ($poi->project_id != $this->guard()->user()->project_id)
                 return response()->json(['error' => '未经授权的操作'], 401);
         }
-
         $devices = Device::where('poi_id', $request->id)->get();
         return response()->json($devices);
     }
@@ -1036,6 +1037,12 @@ class PoiController extends Controller
         $this->validate($request, [
             'id' => 'required',
         ]);
+
+        if($request->has('keyword')){
+            return  response()->json(Device::search(urldecode($request->keyword))
+                                            ->where('poi_id', intval($request->id))
+                                            ->get());
+        }
 
         $devices = Device::where('poi_id', intval($request->id))->get();
         return response()->json($devices);
@@ -1985,7 +1992,7 @@ class PoiController extends Controller
             return response()->json(Device_test::where('device_hex_id',$request->device_hex_id)->get());
 
         }elseif($request->has('keyword')){
-            return response()->json( Device::search($request->keyword)->get());
+            return response()->json( Device_test::search($request->keyword)->get());
         }else{
 
             return response()->json(Device_test::all());
@@ -3041,6 +3048,106 @@ limit  ?,? ',
         }
     }
 
+    public function getTotalDataCount(Request $request){
+        
+        $today_time_stamp = time();
+        $today = getdate($today_time_stamp);
+        $today_year = strval($today['year']);
+        $today_mon = strval($today['mon']);
+        $today_day = strval($today['mday']);
+
+        $start = date_create($today_year.'-'.$today_mon.'-'.$today_day.' '.'00:00:00');
+        $end = date_create($today_year.'-'.$today_mon.'-'.$today_day.' '.'23:59:59');
+        // $start = date_create('1970-01-01 00:00:00');
+
+        $count_total = DB::table('displacementsensor1')
+                    ->join('sensors', 'sensors.id', '=', 'displacementsensor1.device_id')
+                    ->join('devices', 'devices.id', '=', 'sensors.device_id')
+                    ->join('pois', 'pois.id', '=', 'devices.poi_id')
+                    ->join('projects', 'projects.id', '=', 'pois.project_id')
+                    ->where('projects.id', '=', '12')
+                    ->count();
+
+        $count_today = DB::table('displacementsensor1')
+                    ->join('sensors', 'sensors.id', '=', 'displacementsensor1.device_id')
+                    ->join('devices', 'devices.id', '=', 'sensors.device_id')
+                    ->join('pois', 'pois.id', '=', 'devices.poi_id')
+                    ->join('projects', 'projects.id', '=', 'pois.project_id')
+                    ->where([['projects.id', '=', '12'],
+                            ['displacementsensor1.gps_time', '>', $start],
+                            ['displacementsensor1.gps_time', '<', $end]])
+                    ->count();
+        return response()->json(['total'=>$count_total, 'today'=>$count_today]);
+    }
+
+    public function getDeviceOnlineCount(){
+        $online_counts = DB::select(
+            'SELECT
+            (case devices.type
+            WHEN 0 THEN \'未知\'
+            WHEN 15 THEN \'锚索计\'
+            WHEN 100 THEN \'gnss基准站\' 
+            WHEN 1 THEN	\'天线\' 
+            WHEN 3 THEN	\'gnss监测站\' 
+            WHEN 4 THEN	\'雨量计\' 
+            WHEN 5 THEN	\'裂缝计\' 
+            WHEN 6 THEN	\'土壤含水\' 
+            WHEN 8 THEN	\'电源控制器\'
+            ELSE \'其他\' end) as deviceTypeName,
+            COUNT( * ) as count 
+        FROM
+            devices
+            RIGHT JOIN pois ON devices.poi_id = pois.id
+            RIGHT JOIN projects ON pois.project_id = projects.id 
+        WHERE
+            projects.id = 12 
+            AND `online` = 1 
+        GROUP BY
+            devices.type;'
+        );
+        $offline_counts = DB::select(
+            'SELECT
+            (case devices.type
+            WHEN 0 THEN \'未知\'
+            WHEN 15 THEN \'锚索计\'
+            WHEN 100 THEN \'gnss基准站\' 
+            WHEN 1 THEN	\'天线\' 
+            WHEN 3 THEN	\'gnss监测站\' 
+            WHEN 4 THEN	\'雨量计\' 
+            WHEN 5 THEN	\'裂缝计\' 
+            WHEN 6 THEN	\'土壤含水\' 
+            WHEN 8 THEN	\'电源控制器\'
+            ELSE \'其他\' end) as deviceTypeName,
+            COUNT( * ) as count
+        FROM
+            devices
+            RIGHT JOIN pois ON devices.poi_id = pois.id
+            RIGHT JOIN projects ON pois.project_id = projects.id 
+        WHERE
+            projects.id = 12 
+            AND `online` = 0 
+        GROUP BY
+            devices.type;'
+        );
+        
+        foreach($online_counts as $online_count){
+            
+            $results[$online_count->deviceTypeName]['online'] = $online_count->count;
+        }
+        foreach($offline_counts as $offline_count){
+            $results[$offline_count->deviceTypeName]['offline'] = $offline_count->count;
+        }
+        
+        foreach($results as $k=>$v){
+            $temp['name'] = $k;
+            foreach($v as $kk=>$vv){
+                $temp[$kk] = $vv;
+            }
+            $final_return[] =$temp;
+        }
+
+        return response()->json($final_return);
+    }       
 
     public function test(Request $request )
     {

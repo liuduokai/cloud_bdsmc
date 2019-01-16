@@ -43,7 +43,6 @@ function _delDevice($id){
     }
 
     DB::table('crack_device_info')->where('device_table_id','=',$id)->delete();
-    DB::table('device_tests_copy')->where('device_table_id','=',$id)->delete();
     DB::table('device_tests')->where('device_table_id','=',$id)->delete();
     DB::table('online')->where('device_id','=',$id)->delete();
     DB::table('alarmsDevice')->where('device_id','=',$id)->delete();

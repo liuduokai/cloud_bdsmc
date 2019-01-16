@@ -16,7 +16,7 @@ class Device_test extends Model
     use SearchableTrait;
     protected $searchable = [
         'columns' => [
-            'device_test.device_hex_id' =>10,
+            'device_tests.device_hex_id' =>10,
         ],
     ];
 }

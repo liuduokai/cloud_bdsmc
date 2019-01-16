@@ -413,3 +413,11 @@ $router->options('/searchPoiReturnCorrectDevice', ['middleware' => 'cors','uses'
 $router->post('/test1', ['middleware' => 'cors','uses' => 'PoiController@test1']);
 $router->get('/test1', ['middleware' => 'cors','uses' => 'PoiController@test1']);
 $router->options('/test1', ['middleware' => 'cors','uses' => 'PoiController@test1']);
+
+$router->post('/getTotalDataCount', ['middleware' => 'cors','uses' => 'PoiController@getTotalDataCount']);
+$router->get('/getTotalDataCount', ['middleware' => 'cors','uses' => 'PoiController@getTotalDataCount']);
+$router->options('/getTotalDataCount', ['middleware' => 'cors','uses' => 'PoiController@getTotalDataCount']);
+
+$router->post('/getDeviceOnlineCount', ['middleware' => 'cors','uses' => 'PoiController@getDeviceOnlineCount']);
+$router->get('/getDeviceOnlineCount', ['middleware' => 'cors','uses' => 'PoiController@getDeviceOnlineCount']);
+$router->options('/getDeviceOnlineCount', ['middleware' => 'cors','uses' => 'PoiController@getDeviceOnlineCount']);
