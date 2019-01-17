@@ -989,6 +989,8 @@ class PoiController extends Controller
             $poi->lat = $request->input('lat');
         if ($request->has('altitude'))
             $poi->altitude = $request->input('altitude');
+        if ($request->has('type'))
+            $poi->type = $request->input('type');
 
 
         $poi->save();
@@ -1015,6 +1017,8 @@ class PoiController extends Controller
             $poi->lat = $request->input('lat');
         if ($request->has('altitude'))
             $poi->altitude = $request->input('altitude');
+        if ($request->has('type'))
+            $poi->type = $request->input('type');
 
         $poi->save();
         addUserLog('updatePoi2', $this->guard()->user()->id, 3);
@@ -3151,13 +3155,27 @@ limit  ?,? ',
         
         foreach($results as $k=>$v){
             $temp['name'] = $k;
+            $online_flag = 0;
+            $offline_flag = 0;
             foreach($v as $kk=>$vv){
+                if($kk === 'online')
+                    $online_flag = 1;
+                if($kk === 'offline')
+                    $offline_flag = 1;  
                 $temp[$kk] = $vv;
             }
+            if($online_flag == 0){
+                $temp['online'] = 0;
+            }
+            if($offline_flag == 0){
+                $temp['offline'] = 0;
+            }
             $final_return[] =$temp;
+            unset($temp);
         }
 
         return response()->json($final_return);
+        //return response()->json(['off'=>$offline_counts, 'on'=>$online_counts, 're'=>$results, 'fin'=>$final_return]);
     }       
 
     public function test(Request $request )
