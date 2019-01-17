@@ -3096,6 +3096,7 @@ limit  ?,? ',
     }
 
     public function getDeviceOnlineCount(){
+
         $online_counts = DB::select(
             'SELECT
             (case devices.type
@@ -3120,6 +3121,7 @@ limit  ?,? ',
         GROUP BY
             devices.type;'
         );
+
         $offline_counts = DB::select(
             'SELECT
             (case devices.type
@@ -3145,37 +3147,41 @@ limit  ?,? ',
             devices.type;'
         );
         
-        foreach($online_counts as $online_count){
-            
+        foreach($online_counts as $online_count){   
             $results[$online_count->deviceTypeName]['online'] = $online_count->count;
         }
+
         foreach($offline_counts as $offline_count){
             $results[$offline_count->deviceTypeName]['offline'] = $offline_count->count;
         }
         
         foreach($results as $k=>$v){
+
             $temp['name'] = $k;
             $online_flag = 0;
             $offline_flag = 0;
+
             foreach($v as $kk=>$vv){
                 if($kk === 'online')
                     $online_flag = 1;
                 if($kk === 'offline')
                     $offline_flag = 1;  
+
                 $temp[$kk] = $vv;
             }
+
             if($online_flag == 0){
                 $temp['online'] = 0;
             }
             if($offline_flag == 0){
                 $temp['offline'] = 0;
             }
+
             $final_return[] =$temp;
             unset($temp);
         }
-
+        
         return response()->json($final_return);
-        //return response()->json(['off'=>$offline_counts, 'on'=>$online_counts, 're'=>$results, 'fin'=>$final_return]);
     }       
 
     public function test(Request $request )
